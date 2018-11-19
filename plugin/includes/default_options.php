@@ -68,7 +68,7 @@ $this->opt = array_replace_recursive(
 				),
 				'linkedin'=> array(
 					'text'=> 'Share on LinkedIn', 
-					'url'=> 'http://www.linkedin.com/shareArticle?mini=true&url={CONTENTTITLE}',
+					'url'=> 'http://www.linkedin.com/shareArticle?mini=true&url={CONTENTURL}',
 					'active'=> 1,
 					'follow'=>'',
 					'sort'=>0,

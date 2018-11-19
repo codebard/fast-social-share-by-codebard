@@ -52,6 +52,10 @@ $this->internal = array_replace_recursive(
 			'dashboard'=>array(
 				
 			),
+			'social_networks'=>array(
+				
+				
+			),
 			'languages'=>array(
 				
 				

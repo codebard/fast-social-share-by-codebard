@@ -88,6 +88,9 @@ $lang = array(
 	'setup_now_you_can' => 'Now if you want, you can...',
 	'setup_read_manual' => 'Read the Manual',
 	'setup_change_settings' => 'Adjust settings',
+	
+	#MARKER
+	'social_networks' => 'Social Networks',
 
 );
 
