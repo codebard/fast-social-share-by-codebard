@@ -10,10 +10,12 @@ class cb_p2_plugin extends cb_p2_core
 
 		add_action( 'plugins_loaded', array(&$this, 'init'),60);
 		add_action('admin_init', array(&$this, 'admin_init'));
+		
 		// Below admin_menu hook can be removed when relevant issue in plugin engine is fixed: 
 		/*
 		[admin_init] mustn't be placed in an admin_init action function, because the admin_init action is called after admin_menu - plugins have admin_menu in admin_init, hence its not firing
 		*/
+		
 		add_action('admin_menu', array(&$this,'add_admin_menus'));
 		
 		if( $this->required_plugins() AND ( !isset( $this->internal['setup_is_being_done'] ) OR !$this->internal['setup_is_being_done'] ) ) {
@@ -617,26 +619,6 @@ class cb_p2_plugin extends cb_p2_core
 	}
 	
 	
-	public function save_user_last_visited_page_before_login_p() 
-	{
-	
-		global $post;
- 
-		if(is_admin())
-		{
-			
-			setcookie( $this->internal['prefix'].'user_last_visited_page', '', 0 );
-			return;
-		}
-
-		if(!is_user_logged_in() AND strpos($this->get_current_full_url(),$this->get_patreon_landing_page())===false AND (is_single($post->ID) OR is_page($post->ID)))
-		{
-		
-			setcookie( $this->internal['prefix'].'user_last_visited_page', base64_encode(get_permalink($post->ID)), time()+(30 * 3600 * 24));
-		}
-		
-	}
-	
 	public function make_date_select_p($v1=false)
 	{
 		$args = $v1;
@@ -947,6 +929,104 @@ class cb_p2_plugin extends cb_p2_core
 	
 	// #MARKER
 	
+	public function make_share_interface_p( $post_id = false ) {
+		
+		if ( !$post_id ) {
+			
+			global $post;
+			
+			if ( isset( $post->ID ) ) {
+				$post_id = $post->ID;
+			}
+			
+		}
+		
+		if( !$post_id) {
+			return;
+		}
+		
+		// In case the url has https://, replace it with http:// so shares will concentrate on one url
+		$get_url=get_permalink($post_id);
+		
+		$post = get_post( $post->ID );
+		
+		$share_url = urlencode($get_url);
+		
+		$share_title = urlencode( $post->post_title );
+		
+		$share_interface_template = $this->load_template( 'share_interface' );
+		
+		$share_interface_template = $this->process_lang($share_interface_template);
+			
+		// Process the internal ids and replacements
+			
+		$share_interface_template = $this->process_vars_to_template($this->internal, $share_interface_template,array('prefix','id'));
+		
+		$button_template = $this->load_template( 'share_button' );
+		
+		$button_template = $this->process_lang($button_template);
+		
+		$button_template = $this->process_vars_to_template($this->internal, $button_template,array('prefix','id'));	
+		
+		$shares = '';
+		
+		foreach( $this->opt['social_networks'] as $key => $value )
+		{
+			$processed_url = '';
+			
+			$current=$this->opt['social_networks'][$key];
+			
+			if(!$current['active']) {
+				continue;
+			}
+			 
+			$button = $button_template;			
+			
+			$processed_url=str_replace('{CONTENTTITLE}',$share_title,$current['url']);
+			$processed_url=str_replace('{CONTENTURL}',$share_url,$processed_url);
+			
+			if($key=='twitter')
+			{
+				$processed_url=str_replace('{FOLLOWACCOUNT}',$this->opt['social_networks'][$key]['follow'],$processed_url);
+		
+			
+			}
+			if($key=='pinterest')
+			{
+					
+				$processed_url=str_replace('{CONTENTIMAGE}',wp_get_attachment_url(get_post_thumbnail_id()),$processed_url);
+				
+			}
+			
+			$button_content = $this->get_share_button_content( $key, $processed_url, $current['text'] );
+			
+			$vars = array(
+				'button_content' => $button_content,
+			);
+			
+			$button = $this->process_vars_to_template($vars, $button);
+			
+			$shares .= $button;
+						
+		
+		}
+		
+		
+		$vars=array(
+			'social_share_buttons' => $shares,
+		);
+		
+		$share_interface_template = $this->process_vars_to_template($vars, $share_interface_template);
+		
+		return $share_interface_template;
+		
+		
+	}
+	
+	public function get_share_button_content_p( $network, $url, $text ) {
+		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'">'.$text.'</a>';		
+	}
+	
 	public function add_post_buttons_p( $content ) {
 		
 		// Return if it is not a post from an accepted post type		
@@ -956,18 +1036,11 @@ class cb_p2_plugin extends cb_p2_core
 	
 		global $post;
 		
-		// In case the url has https://, replace it with http:// so shares will concentrate on one url
-		$get_url=get_permalink($post->ID);
+		$share_interface = $this->make_share_interface( $post->ID );
 		
-		$share_url = urlencode($get_url);
+		return $content.$share_interface;
 		
-		$share_title = urlencode( $post->post_title );
-		
-
-		// form array of items set to 1
-		$shares.='<div class="cb_p2_share_container"><ul class="cb_p2_socialshare">';
-		$follows.='<div class="cb_p2_follow_container"><ul class="cb_p2_socialshare">You can follow CodeBard from below social networks<br clear="both">';
-		foreach($this->opt['social_networks'] as $key => $value)
+		foreach( $this->opt['social_networks'] as $key => $value )
 		{
 			$processed_url='';
 			$current=$this->opt['social_networks'][$key];
@@ -977,8 +1050,8 @@ class cb_p2_plugin extends cb_p2_core
 				continue;
 			}
 			 
-			$shares .= '<li class="cb_p2_socialshare_item">';	
-			$follows .= '<li class="cb_p2_socialshare_item">';	
+			$shares .= '<li class="cb_p2_social_share_item">';	
+			$follows .= '<li class="cb_p2_social_share_item">';	
 		
 			
 			$processed_url=str_replace('{CONTENTTITLE}',$share_title,$current['url']);
@@ -996,15 +1069,16 @@ class cb_p2_plugin extends cb_p2_core
 				$processed_url=str_replace('{CONTENTIMAGE}',wp_get_attachment_url(get_post_thumbnail_id()),$processed_url);
 				
 			}			
-			$shares .= '<a class="cb_p2_socialshare_link cb_p2_socialshare_button_'.$key.'" href="'.$processed_url.'" rel="nofollow" target="_blank">'.$current['text'].'</a>';	
+			$shares .= '<a class="cb_p2_social_share_link cb_p2_social_share_button_'.$key.'" href="'.$processed_url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'">'.$current['text'].'</a>';
+			
 			if($current['follow']!='')
 			{
 				if($key=='twitter')
 				{
-					$current['follow']='http://twitter.com/'.$current['follow'];
-				
+					$current['follow']='https://twitter.com/'.$current['follow'];
+			
 				}			
-				$follows .= '<a class="cb_p2_socialshare_link cb_p2_socialshare_button_'.$key.'" href="'.$current['follow'].'" rel="nofollow" target="_blank">&nbsp;</a>';	
+				$follows .= '<a class="cb_p2_social_share_link cb_p2_social_share_button_'.$key.'" href="'.$current['follow'].'" rel="nofollow" target="'.$this->opt['functionality']['follow_link_target'].'">&nbsp;</a>';	
 			}
 			$shares .= '</li>';				
 			$follows .= '</li>';				
@@ -1028,29 +1102,29 @@ class cb_p2_plugin extends cb_p2_core
 		
 			.cb_p2_share_container {
 				display: inline-table:
-				width : 100%;
+				width : '.$this->opt['style']['button_container_width'].';
 				clear:both;
-				margin-top:20px;
+				margin-top:'.$this->opt['style']['button_container_margin_top'].';
 			}
 
 		
-			.cb_p2_socialshare {
-				padding-left: 0;
+			.cb_p2_social_share {
+				padding-left: '.$this->opt['style']['button_container_padding_left'].';
 				list-style: none; 
-				text-align : center;
+				text-align : '.$this->opt['style']['button_container_text_align'].';
 			}
 
-			.cb_p2_socialshare_item {
+			.cb_p2_social_share_item {
 				display: inline;
 				font-size : '.$this->opt['style']['button_font_size'].'em;
 			}
 	
-			.cb_p2_socialshare_follow_item {
+			.cb_p2_social_share_follow_item {
 				display: inline;
 				font-size : '.$this->opt['style']['follow_button_icon_size'].'px;
 			}
 	
-			.cb_p2_socialshare_link {
+			.cb_p2_social_share_link {
 			
 				text-decoration: '.$this->opt['style']['button_text_decoration'].';
 				color: '.$this->opt['style']['button_link_color'].';
@@ -1066,12 +1140,12 @@ class cb_p2_plugin extends cb_p2_core
 			  
 			  }
 			  
-			.cb_p2_socialshare_follow_link {
+			.cb_p2_social_share_follow_link {
 			
 				text-decoration: '.$this->opt['style']['button_text_decoration'].';
 				color: '.$this->opt['style']['button_link_color'].';
 				font-weight: '.$this->opt['style']['button_font_weight'].';
-				padding: .5em .5em .5em .5em;
+				padding: '.$this->opt['style']['button_padding'].';
 				background-color: '.$this->opt['style']['button_background_color'].';
 				border: '.$this->opt['style']['button_border_thickness'].'px '.$this->opt['style']['button_border_style'].' '.$this->opt['button_border_color'].';
 				display: inline-block;
@@ -1082,9 +1156,9 @@ class cb_p2_plugin extends cb_p2_core
 			  
 			  }			  
 			  
-			.cb_p2_socialshare_link:hover, 
-			.cb_p2_socialshare_link:active, 
-			.cb_p2_socialshare_link:focus 
+			.cb_p2_social_share_link:hover, 
+			.cb_p2_social_share_link:active, 
+			.cb_p2_social_share_link:focus 
 			{
 				color: #0000ff;
 				text-decoration : none;
@@ -1092,17 +1166,22 @@ class cb_p2_plugin extends cb_p2_core
 			';
 			
 			foreach($this->opt['social_networks'] as $key => $value) {
-				echo '			.cb_p2_socialshare_button_'.$key.' {
-				background-image: url("'.$this->internal['plugin_url'].'plugin/templates/default/images/icon_set_1/'.$key.$this->opt['style']['button_icon_size'].'.png");
-				}';
+				echo $this->get_share_button_css($key);
 
 			}
 			
+	}
+	
+	public function get_share_button_css_p( $network ) {
 		
-		echo '</style>';
+		return '			.cb_p2_social_share_button_'.$network.' {
+				background-image: url("'.$this->internal['plugin_url'].'plugin/images/'.$this->opt['style']['icon_set'].'/'.$network.'/'.$this->opt['style']['button_icon_size'].'.png");
+				}';
 
+	}
+	
 
-	}	
+	
 	
 }
 

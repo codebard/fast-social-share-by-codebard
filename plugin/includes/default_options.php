@@ -10,12 +10,6 @@ $this->opt = array_replace_recursive(
 			'template'=> 'default',
 			'setup_done'=> false,
 			'license'=> '',
-			'dashboard'=> array(
-			
-				'custom_button'=> '',
-			
-			
-			),
 			
 			#MARKER
 			
@@ -33,9 +27,18 @@ $this->opt = array_replace_recursive(
 				'button_text_decoration'=>'none',		
 				'button_icon_size'=>'24',		
 				'follow_button_icon_size'=>'32',
+				'icon_set'=>'set_2',
+				'button_container_width'=>'100%',
+				'button_container_margin_top'=>'20px',
+				'button_container_text_align'=>'center',
+				'button_container_padding_left'=>'0px',
+				'button_padding'=>'5em',
 			),
-			
-
+			'functionality' => array(
+				'share_link_target'=>'_blank',
+				'follow_link_target'=>'_blank',
+			),
+		
 			'social_networks'=>array(
 			
 				'facebook'=> array(
