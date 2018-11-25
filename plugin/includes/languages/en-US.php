@@ -91,6 +91,15 @@ $lang = array(
 	
 	#MARKER
 	'social_networks' => 'Social Networks',
+	'social_networks_name' => 'Social Network Name',
+	'social_networks_id' => 'Id ( a simple word with all lowercase - letters only )',
+	'social_networks_text_before' => 'Text to show before the network icon. Generally not necessary',
+	'social_networks_text_after' => 'Text to show after the network icon. Like, "Share on Facebook", or "Tweet" (for twitter)',
+	'social_networks_url' => 'The GET share URL of the social network',
+	'social_networks_active' => 'Social network active/inactive. Inactive networks won\'t be shown in the share buttons list',
+	'social_networks_follow' => 'Follow URL of your account at the social network, if it exists',
+	'social_networks_sort' => 'Sort order of the social network. Smaller numbers will show up before bigger numbers',
+	'social_networks_select_network' => 'Select Social Network to edit',
 
 );
 

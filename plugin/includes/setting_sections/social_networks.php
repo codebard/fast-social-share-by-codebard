@@ -1,34 +1,41 @@
-	<div class="cb_p2_setup_wizard_one_col" style="text-align : center;font-size : 100%; max-width : 600px;padding-top: 30px;">
-	
-			<button class="cb_p2_admin_button" onclick="window.open('https://codebard.com/patreon-button-and-plugin-manual');" target="_blank"><?php echo $this->lang['setup_read_manual'];?></button>
-	
-			
-		<?php 	echo $pro_manual; 	?>
+<?php 
 
-	</div>
-	<div class="cb_p2_setup_wizard_two_col" style="max-width : 600px;">
-	
-		<div class="cb_p2_setup_wizard_col_33" style="text-align : center; max-width : 600px;">
-		
-			<?php echo $this->lang['setup_wizard_follow_us_on_twitter'];?><br><br><a href="https://twitter.com/codebardcom" class="twitter-follow-button" data-show-count="false"><?php echo $this->lang['setup_wizard_twitter_follow_label_prefix'];?> @CodeBard</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-			
-		</div>
-	
-		<div class="cb_p2_setup_wizard_col_33" style="text-align : center;">
-		
-			<?php echo $this->lang['setup_wizard_join_list']; ?>
-			<br><br>
-	
-			<button class="cb_p2_admin_button" onclick="window.open('<?php echo $this->lang['newsletter_link'] ?>');" target="_blank"><?php echo $this->lang['setup_wizard_join_mailing_list_link_label'];?></button>
-		</div>
-		
 
-		<div class="cb_p2_setup_wizard_col_33" style="text-align : center;">
-		
-			<a href="<?php echo $this->lang['tell_your_friends_tweet']; ?>" target="_blank"><?php echo $this->lang['tell_your_friends']; ?></a>
-			<br><br>
-	
-		</div>
-		
 
-	</div>
+
+echo '<h2>'.$this->lang['social_networks_select_network'].'</h2>';
+
+if($this->opt['assign_tickets_to_admins']=='yes')
+{
+	$assign_tickets_to_admins_checked_yes=" CHECKED";
+}
+else
+{
+	$assign_tickets_to_admins_checked_no=" CHECKED";
+}
+
+
+
+echo '<h2>'.$this->lang['option_title_assign_tickets_to_admins'].'</h2>';
+
+
+
+	foreach ( $this->opt['social_networks'] as $key => $value ) {
+		
+		
+		echo '<a href="" class="'.$this->internal['prefix'].'social_network_edit" target="'.$this->internal['prefix'].'network_editor" network="'.$key.'">'.$this->opt['social_networks'][$key]['name'].'</a>';
+		
+		
+	}
+	
+echo '<div id="'.$this->internal['prefix'].'network_editor"></div>';
+
+
+echo '<h2>'.$this->lang['option_title_assign_tickets_to_admins'].'</h2>';
+
+echo '<div class="'.$this->internal['prefix'].'option_info">'.$this->lang['option_info_assign_tickets_to_admins'].'</div>';
+
+echo $this->lang['yes'].' <input type="radio" name="opt[assign_tickets_to_admins]" value="yes"'.$assign_tickets_to_admins_checked_yes.'>'.$this->lang['no'].' <input type="radio" name="opt[assign_tickets_to_admins]" value="no"'.$assign_tickets_to_admins_checked_no.'>';
+
+
+

@@ -55,6 +55,8 @@ class cb_p2_plugin extends cb_p2_core
 		$this->internal['plugin_update_url'] =  wp_nonce_url(get_admin_url().'update.php?action=upgrade-plugin&plugin='.$this->internal['plugin_slug'],'upgrade-plugin_'.$this->internal['plugin_slug']);
 		
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'install_update_plugins', array( &$this, 'install_update_plugins' ),10,1 );
+		
+		add_action( 'wp_ajax_'.$this->internal['prefix'].'social_network_edit', array( &$this, 'social_network_edit' ),10,1 );
 				
 	}
 	public function init_p()
@@ -1007,10 +1009,8 @@ class cb_p2_plugin extends cb_p2_core
 			$button = $this->process_vars_to_template($vars, $button);
 			
 			$shares .= $button;
-						
 		
 		}
-		
 		
 		$vars=array(
 			'social_share_buttons' => $shares,
@@ -1177,6 +1177,47 @@ class cb_p2_plugin extends cb_p2_core
 		return '			.cb_p2_social_share_button_'.$network.' {
 				background-image: url("'.$this->internal['plugin_url'].'plugin/images/'.$this->opt['style']['icon_set'].'/'.$network.'/'.$this->opt['style']['button_icon_size'].'.png");
 				}';
+
+	}
+	
+	
+	public function social_network_edit_p( ) {
+		
+		// Loads social network for editing or loads a form for adding
+		
+		
+		if ( $_REQUEST[$this->internal['prefix'].'network'] != '' ) {
+			
+			$network = $_REQUEST[$this->internal['prefix'].'network'];
+		
+		}
+		
+		
+		$social_network_edit_form = $this->load_template('social_network_edit_form');
+		
+		$social_network_edit_form = $this->process_lang($social_network_edit_form);
+			
+		// Process the internal ids and replacements
+			
+		$social_network_edit_form = $this->process_vars_to_template($this->internal, $social_network_edit_form,array('prefix','id'));
+		
+		
+		$vars=array(
+			'network_name' => $this->opt['social_networks'][$network]['name'],
+			'network_id' => $this->opt['social_networks'][$network]['id'],
+			'text_before' => $this->opt['social_networks'][$network]['text_before'],
+			'text_after' => $this->opt['social_networks'][$network]['text_after'],
+			'icon' => $this->opt['social_networks'][$network]['icon'],
+			'url' => $this->opt['social_networks'][$network]['url'],
+			'active' => $this->opt['social_networks'][$network]['active'],
+			'follow' => $this->opt['social_networks'][$network]['follow'],
+			'sort' => $this->opt['social_networks'][$network]['order'],
+		);
+		
+		$social_network_edit_form = $this->process_vars_to_template($vars, $social_network_edit_form);
+		
+		echo $social_network_edit_form;
+		wp_die();
 
 	}
 	

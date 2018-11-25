@@ -13,11 +13,19 @@ Fast Custom Social Share loads fast, is extensively customizable, and allows you
 
 == Description ==
 
-Fast Custom Social Share uses customizable, static share buttons that work without any external JavaScript. Thanks to that, it doesn't add any loading time to your site's pages. it's icons come in all sizes from 16px to 64px, which lets you select an icon size that fits your site and has the best load times.
+Fast Custom Social Share uses customizable, static share buttons that work without any external JavaScript. Thanks to that, it makes your pages loads faster. It also prevents tracking of your users by 3rd parties.
 
-You can add any social network to the plugin from the plugin admin!
+You can add any social network which is not already provided! You can activate/deactivate any social network from options.
 
-You can choose the placement of the share buttons inside your posts, you can customize their appearance, size and other features. You can use 'Follow us' widgets and invite your users to follow you in the social media accounts you have using widgets or inside the posts themselves. 
+Select from 6 different, professionally designed icon sets! Choose the best set that goes with your theme and your content! More icon sets are on the way!
+
+You can choose the placement of the share buttons inside your posts, their alignment, you can customize button appearance, size, margin, turn on/off share text, customize all the features.
+
+Full features:
+
+- Beautifully designed buttons
+- Fast - loads no external JavaScript. 
+- Customizable - 
 
 ---------------------------
 

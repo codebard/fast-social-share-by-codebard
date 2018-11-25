@@ -9,9 +9,43 @@ jQuery(document).ready(function($) {
 	
 
 	jQuery(".cb_p2_toggle").click(function (e) {
+		e.preventDefault();
 		var cb_p2_input_target = document.getElementById(jQuery(this).attr('target'));
-        e.preventDefault();
 		jQuery(cb_p2_input_target).toggle('slow');
+		
+	});
+	jQuery(".cb_p2_social_network_edit").click(function (e) {
+		e.preventDefault();
+		var cb_p2_input_target = document.getElementById(jQuery(this).attr('target'));
+		var cb_p2_network = jQuery(this).attr('network');
+		console.log(cb_p2_network);
+		
+		jQuery(cb_p2_input_target).empty();
+		jQuery(cb_p2_input_target).html('Processing...');	
+
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'cb_p2_social_network_edit',
+				cb_p2_network: cb_p2_network,
+			},
+			success: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+			},
+			error: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+			},
+			statusCode: {
+				500: function(error) {
+					jQuery(cb_p2_input_target).empty();
+					jQuery(cb_p2_input_target).html(error);
+				}
+			}
+		});
 		
 	});
 	
@@ -94,7 +128,6 @@ jQuery(document).ready(function($) {
 			success: function( response ) {
 				jQuery(cb_p2_input_target).empty();
 				if( response == '' ) {
-					console.log('caught return');
 					//White page - possibly an issue with the server/site caused an error during updates
 					response = cb_p2_general_error;
 				}
@@ -102,7 +135,6 @@ jQuery(document).ready(function($) {
 			},
 			error: function( response ) {
 				if( response == '' ) {
-					console.log('caught error');
 					//White page - possibly an issue with the server/site caused an error during updates
 					response = cb_p2_general_error;
 				}
@@ -119,6 +151,8 @@ jQuery(document).ready(function($) {
 		});
 		
 	});
+	
+	
 	
 	
 });
