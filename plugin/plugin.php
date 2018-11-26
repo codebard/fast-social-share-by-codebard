@@ -57,6 +57,8 @@ class cb_p2_plugin extends cb_p2_core
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'install_update_plugins', array( &$this, 'install_update_plugins' ),10,1 );
 		
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'social_network_edit', array( &$this, 'social_network_edit' ),10,1 );
+		
+		add_action( 'wp_ajax_'.$this->internal['prefix'].'update_social_network', array( &$this, 'social_network_add_update' ),10,1 );
 				
 	}
 	public function init_p()
@@ -1181,15 +1183,51 @@ class cb_p2_plugin extends cb_p2_core
 	}
 	
 	
+	public function social_network_add_update_p() {
+	
+		// Adds/updates social network
+		
+		if ( !current_user_can( 'manage_options' ) ) {
+			return;
+		}
+echo '<pre>';
+print_r($this->opt);
+echo '</pre>';
+
+		echo '<pre>';
+		print_r($_POST);
+		echo '</pre>';
+		
+		$unparsed_data = $_POST['cb_p2_network_details'];
+		parse_str($unparsed_data,$social_network);
+		echo '<pre>';
+		print_r($social_network);
+		echo '</pre>';
+		
+		$this->opt['social_networks'][$_REQUEST['cb_p2_network']] = $social_network['cb_p2_network_details'][$_REQUEST['cb_p2_network']];
+
+		$this->update_opt();
+		
+		echo '<div class="cb_p2_processing_message">Network updated!</div>';
+		wp_die();
+	
+	}
 	public function social_network_edit_p( ) {
 		
 		// Loads social network for editing or loads a form for adding
 		
-		
+		if ( !current_user_can( 'manage_options' ) ) {
+			return;
+		}
+				
 		if ( $_REQUEST[$this->internal['prefix'].'network'] != '' ) {
 			
 			$network = $_REQUEST[$this->internal['prefix'].'network'];
 		
+		}
+		
+		if ( $network == '' ) {
+			$network = 'add_new';
 		}
 		
 		
@@ -1201,6 +1239,11 @@ class cb_p2_plugin extends cb_p2_core
 			
 		$social_network_edit_form = $this->process_vars_to_template($this->internal, $social_network_edit_form,array('prefix','id'));
 		
+		// Always reset 'add_new' network if it exists
+		
+		if ( isset( $this->opt['social_networks']['add_new'] ) ) {
+			unset( $this->opt['social_networks']['add_new'] );
+		}
 		
 		$vars=array(
 			'network_name' => $this->opt['social_networks'][$network]['name'],
@@ -1211,7 +1254,7 @@ class cb_p2_plugin extends cb_p2_core
 			'url' => $this->opt['social_networks'][$network]['url'],
 			'active' => $this->opt['social_networks'][$network]['active'],
 			'follow' => $this->opt['social_networks'][$network]['follow'],
-			'sort' => $this->opt['social_networks'][$network]['order'],
+			'sort' => $this->opt['social_networks'][$network]['sort'],
 		);
 		
 		$social_network_edit_form = $this->process_vars_to_template($vars, $social_network_edit_form);

@@ -55,7 +55,7 @@ $this->opt = array_replace_recursive(
 				'twitter'=> array(
 					'name'=> 'Twitter',
 					'id'=> 'Twitter', 
-					'text_before'=> '', 
+					'text_before'=> '',
 					'text_after'=> 'Share on Twitter', 
 					'icon'=> 'default', 
 					'url'=> 'http://twitter.com/share?text={CONTENTTITLE}&amp;url={CONTENTURL}&amp;via={FOLLOWACCOUNT}',

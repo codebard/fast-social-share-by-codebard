@@ -18,10 +18,9 @@ jQuery(document).ready(function($) {
 		e.preventDefault();
 		var cb_p2_input_target = document.getElementById(jQuery(this).attr('target'));
 		var cb_p2_network = jQuery(this).attr('network');
-		console.log(cb_p2_network);
 		
 		jQuery(cb_p2_input_target).empty();
-		jQuery(cb_p2_input_target).html('Processing...');	
+		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Processing...</div>');	
 
 		jQuery.ajax({
 			url: ajaxurl,
@@ -104,7 +103,60 @@ jQuery(document).ready(function($) {
 		jQuery(this).prev().val('');
 	
 	});
+	
 
+	jQuery(document).on( 'submit', '#cb_p2_social_network_edit_form', function(e) {
+		
+        e.preventDefault();
+	
+		var cb_p2_input_target = document.getElementById(jQuery(this).attr('ajax_target_div'));
+		
+		jQuery('#cb_p2_social_network_edit_form').remove();
+
+		jQuery(cb_p2_input_target).empty();
+		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Processing...</div>');	
+
+		var cb_p2_general_error = '<div class="cb_p2_processing_message">Sorry - could not update the social network...</div>';		
+		
+		var data = jQuery(this).find('input[name^="cb_p2_network_details"]').serialize();
+		var social_network = jQuery(this).find('input[name^="cb_p2_network_id"]').val();
+		
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'cb_p2_update_social_network',
+				cb_p2_network_details: data,
+				cb_p2_network: social_network,
+			},
+			success: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				if( response == '' ) {
+					//White page - possibly an issue with the server/site caused an error during updates
+					response = cb_p2_general_error;
+				}
+				jQuery(cb_p2_input_target).html(response);
+			},
+			error: function( response ) {
+				if( response == '' ) {
+					//White page - possibly an issue with the server/site caused an error during updates
+					response = cb_p2_general_error;
+				}
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+			},
+			statusCode: {
+				500: function(error) {
+					response = cb_p2_general_error;
+					jQuery(cb_p2_input_target).empty();
+					jQuery(cb_p2_input_target).html(response);
+				}
+			}
+		});
+		
+	});
+	
 	jQuery(document).on( 'submit', '#cb_p2_ajax_plugin_install_form', function(e) {
 		
         e.preventDefault();
