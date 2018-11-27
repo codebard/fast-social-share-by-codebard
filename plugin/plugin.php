@@ -59,6 +59,16 @@ class cb_p2_plugin extends cb_p2_core
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'social_network_edit', array( &$this, 'social_network_edit' ),10,1 );
 		
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'update_social_network', array( &$this, 'social_network_add_update' ),10,1 );
+
+		add_action( 'wp_ajax_'.$this->internal['prefix'].'make_social_network_list', array( &$this, 'make_social_network_list' ),10,1 );
+		
+		add_action( 'wp_ajax_'.$this->internal['prefix'].'delete_social_network', array( &$this, 'delete_social_network' ),10,1 );
+		
+		// Add css to head in admin if the page is related to the design wizard
+		
+		if ( $_REQUEST['cb_p2_tab'] == 'customize_design' ) {
+			add_action('admin_head', array(&$this, 'add_css_to_head'));
+		}
 				
 	}
 	public function init_p()
@@ -945,18 +955,21 @@ class cb_p2_plugin extends cb_p2_core
 			
 		}
 		
-		if( !$post_id) {
-			return;
+		
+		$share_url = '';
+		$share_title = '';
+		
+		if ( $post_id ) {
+			
+			// In case the url has https://, replace it with http:// so shares will concentrate on one url
+			$get_url=get_permalink($post_id);
+			
+			$post = get_post( $post_id );
+			
+			$share_url = urlencode($get_url);
+			
+			$share_title = urlencode( $post->post_title );
 		}
-		
-		// In case the url has https://, replace it with http:// so shares will concentrate on one url
-		$get_url=get_permalink($post_id);
-		
-		$post = get_post( $post->ID );
-		
-		$share_url = urlencode($get_url);
-		
-		$share_title = urlencode( $post->post_title );
 		
 		$share_interface_template = $this->load_template( 'share_interface' );
 		
@@ -1002,7 +1015,7 @@ class cb_p2_plugin extends cb_p2_core
 				
 			}
 			
-			$button_content = $this->get_share_button_content( $key, $processed_url, $current['text'] );
+			$button_content = $this->get_share_button_content( $key, $processed_url, $current['text_before'], $current['text_after'] );
 			
 			$vars = array(
 				'button_content' => $button_content,
@@ -1025,20 +1038,26 @@ class cb_p2_plugin extends cb_p2_core
 		
 	}
 	
-	public function get_share_button_content_p( $network, $url, $text ) {
-		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'">'.$text.'</a>';		
+	public function get_share_button_content_p( $network, $url, $text_before, $text_after ) {
+		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'">'.$text_after.'</a>';		
 	}
 	
 	public function add_post_buttons_p( $content ) {
 		
 		// Return if it is not a post from an accepted post type		
-		if(in_array('get_the_excerpt', $GLOBALS['wp_current_filter']) OR !in_array( get_post_type(), $this->opt['accepted_post_types'] ) ) {
+		if( (in_array('get_the_excerpt', $GLOBALS['wp_current_filter']) OR !in_array( get_post_type(), $this->opt['accepted_post_types'] ) AND $_REQUEST['cb_p2_tab'] != 'customize_design' ) ) {
 			return $content;
 		}
+		
+		$post_id = false;
 	
 		global $post;
 		
-		$share_interface = $this->make_share_interface( $post->ID );
+		if ( isset ( $post->ID ) ) {
+			$post_id = $post->ID;
+		}
+				
+		$share_interface = $this->make_share_interface( $post_id );
 		
 		return $content.$share_interface;
 		
@@ -1096,14 +1115,24 @@ class cb_p2_plugin extends cb_p2_core
 
 
 	}
+
+	public function add_css_to_head2_p() {
+	echo '<style>
+		
+		.cb_p2_share_container {
+				display: inline-table;
+			}
+			
+			</style>';
 	
+	}
 	public function add_css_to_head_p() {
-	
+
 		echo '<style>
 		
 		
 			.cb_p2_share_container {
-				display: inline-table:
+				display: inline-table;
 				width : '.$this->opt['style']['button_container_width'].';
 				clear:both;
 				margin-top:'.$this->opt['style']['button_container_margin_top'].';
@@ -1149,7 +1178,7 @@ class cb_p2_plugin extends cb_p2_core
 				font-weight: '.$this->opt['style']['button_font_weight'].';
 				padding: '.$this->opt['style']['button_padding'].';
 				background-color: '.$this->opt['style']['button_background_color'].';
-				border: '.$this->opt['style']['button_border_thickness'].'px '.$this->opt['style']['button_border_style'].' '.$this->opt['button_border_color'].';
+				border: '.$this->opt['style']['button_border_thickness'].'px '.$this->opt['style']['button_border_style'].' '.$this->opt['style']['button_border_color'].';
 				display: inline-block;
 				background-size: '.$this->opt['style']['follow_button_icon_size'].'px '.$this->opt['style']['follow_button_icon_size'].'px;
 				background-repeat: no-repeat;
@@ -1165,13 +1194,14 @@ class cb_p2_plugin extends cb_p2_core
 				color: #0000ff;
 				text-decoration : none;
 			}
+			
 			';
 			
 			foreach($this->opt['social_networks'] as $key => $value) {
 				echo $this->get_share_button_css($key);
 
 			}
-			
+			echo '</style>';
 	}
 	
 	public function get_share_button_css_p( $network ) {
@@ -1190,27 +1220,69 @@ class cb_p2_plugin extends cb_p2_core
 		if ( !current_user_can( 'manage_options' ) ) {
 			return;
 		}
-echo '<pre>';
-print_r($this->opt);
-echo '</pre>';
 
-		echo '<pre>';
-		print_r($_POST);
-		echo '</pre>';
+		$unparsed_data = $_POST['data'];
+		parse_str($unparsed_data,$parsed_social_network);
 		
-		$unparsed_data = $_POST['cb_p2_network_details'];
-		parse_str($unparsed_data,$social_network);
-		echo '<pre>';
-		print_r($social_network);
-		echo '</pre>';
+	
+		foreach ( $parsed_social_network as $key => $value ) {
+			// Snip prefix
+			$new_key = str_replace('cb_p2_','',$key);
+			$social_network[$new_key]=$parsed_social_network[$key];
+		}
 		
-		$this->opt['social_networks'][$_REQUEST['cb_p2_network']] = $social_network['cb_p2_network_details'][$_REQUEST['cb_p2_network']];
+		// If no key, abort
 
+
+		if ( $social_network['existing_network_id'] == 'add_new' AND $social_network['id'] == '' ) {
+			echo '<div class="cb_p2_processing_message">Sorry - network id is required...</div>';
+			wp_die();
+		}
+
+		if ( !ctype_lower( $social_network['existing_network_id'] ) AND !ctype_lower( $social_network['id']) ) {
+			echo '<div class="cb_p2_processing_message">Sorry - network id needs to be all lowercase and only letters....</div>';
+			wp_die();
+		}
+		
+		if ( !isset( $social_network['id'] ) OR $social_network['id'] == '' ) {
+			$social_network['id'] = $social_network['existing_network_id'];
+		}
+		unset($social_network['existing_network_id']);
+		// If it is an existing network, dont change the id.
+		
+		$this->opt['social_networks'][$social_network['id']] = $social_network;
+		
+		// Always unset 'add_new' network if it was ever added:
+		
+		unset($this->opt['social_networks']['add_new']);
+		unset($this->opt['social_networks']['']);
+		
 		$this->update_opt();
 		
 		echo '<div class="cb_p2_processing_message">Network updated!</div>';
 		wp_die();
 	
+	}
+	public function delete_social_network_p( ) {
+		
+		// Deletes a given social network
+		
+		if ( !current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		
+		if ( $_REQUEST[''] == '' AND $_REQUEST['cb_p2_network'] != ''  ) {
+			
+			unset( $this->opt['social_networks'][$_REQUEST['cb_p2_network']] );
+			$this->update_opt();
+			
+		}
+		
+		echo '<div class="cb_p2_processing_message">Network deleted!</div>';
+		
+		if (defined('DOING_AJAX') && DOING_AJAX) {
+			wp_die();
+		}
 	}
 	public function social_network_edit_p( ) {
 		
@@ -1233,6 +1305,28 @@ echo '</pre>';
 		
 		$social_network_edit_form = $this->load_template('social_network_edit_form');
 		
+		// If a new network is not being added, dont show the id box:
+		
+		$network_box = '
+	<h4 class="{***prefix***}social_network_form_title">{%%%social_networks_id%%%}</h4>
+	<input type="text" name="{***prefix***}id" value="{***network_id***}" />';
+		
+		if ( $network != 'add_new' ) {
+			$network_box = '';			
+		}
+		
+
+		$vars = array( 
+		
+			'network_id_box' => $network_box,
+		
+		);
+
+
+		// Set the network id box
+		$social_network_edit_form = $this->process_vars_to_template($vars, $social_network_edit_form);
+			
+		
 		$social_network_edit_form = $this->process_lang($social_network_edit_form);
 			
 		// Process the internal ids and replacements
@@ -1245,16 +1339,45 @@ echo '</pre>';
 			unset( $this->opt['social_networks']['add_new'] );
 		}
 		
+		
+		// Now set the other vars
+		
+		
+		if ( isset( $this->opt['social_networks'][$network]['id'] ) ) {		
+			$existing_network_id = $this->opt['social_networks'][$network]['id'];		
+			$new_network_id = $this->opt['social_networks'][$network]['id'];		
+		}
+		
+		// Make case for network id if it is a new network
+		if ( $network == 'add_new' ) {
+			$existing_network_id = 'add_new';			
+			$new_network_id = '';			
+		}
+		
+		$network_active='';
+		$network_inactive='';
+		
+		if ( $this->opt['social_networks'][$network]['active'] == 'yes' ) {
+			$network_active=' selected';
+		}
+		if ( $this->opt['social_networks'][$network]['active'] == 'no' ) {
+			$network_inactive=' selected';
+		}
+			
+		$social_network_active_selector = '<select name="cb_p2_active"><option value="yes" '.$network_active.'>Yes</option><option value="no" '.$network_inactive.'>No</option></select>';
+		
+		
 		$vars=array(
 			'network_name' => $this->opt['social_networks'][$network]['name'],
-			'network_id' => $this->opt['social_networks'][$network]['id'],
+			'network_id' => $new_network_id,
 			'text_before' => $this->opt['social_networks'][$network]['text_before'],
 			'text_after' => $this->opt['social_networks'][$network]['text_after'],
 			'icon' => $this->opt['social_networks'][$network]['icon'],
 			'url' => $this->opt['social_networks'][$network]['url'],
-			'active' => $this->opt['social_networks'][$network]['active'],
+			'social_network_active' => $social_network_active_selector,
 			'follow' => $this->opt['social_networks'][$network]['follow'],
 			'sort' => $this->opt['social_networks'][$network]['sort'],
+			'existing_network_id' => $existing_network_id,
 		);
 		
 		$social_network_edit_form = $this->process_vars_to_template($vars, $social_network_edit_form);
@@ -1262,6 +1385,41 @@ echo '</pre>';
 		echo $social_network_edit_form;
 		wp_die();
 
+	}
+	public function make_social_network_list_p() {
+		
+		// Makes social network selection list for admin
+		
+		
+		if ( !current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		
+		echo '<div class="'.$this->internal['prefix'].'social_network_edit_wrapper">';
+
+		foreach ( $this->opt['social_networks'] as $key => $value ) {
+			
+			if( $this->opt['social_networks'][$key]['id'] =='' ) {
+				continue;
+			}
+			
+			$icon_url = $this->internal['plugin_url'].'plugin/images/set_1/'.$key.'/20.png';
+			
+			if ( $this->opt['social_networks'][$key]['icon'] != 'default' ) {
+				$icon_url = $this->opt['social_networks'][$key]['icon'];
+			}
+			
+			echo '<div class="'.$this->internal['prefix'].'social_network_edit_button '.$this->internal['prefix'].'social_network_edit" target="'.$this->internal['prefix'].'network_editor" network="'.$key.'"><img src="'. $icon_url . '" style="width:20px; height:20px;" />'.$this->opt['social_networks'][$key]['name'].'</div>';
+			
+			 
+		}
+
+		echo '<div class="'.$this->internal['prefix'].'social_network_edit_button '.$this->internal['prefix'].'social_network_edit" target="'.$this->internal['prefix'].'network_editor" network="add_new"><img src="'.$this->internal['plugin_url'].'plugin/images/set_1/add_network.png" style="width:20px; height:20px;" />Add New</div>';
+		
+		echo '</div>';
+		if (defined('DOING_AJAX') && DOING_AJAX) {
+			wp_die();
+		}
 	}
 	
 

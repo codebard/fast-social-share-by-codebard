@@ -54,6 +54,10 @@ $this->internal = array_replace_recursive(
 				
 				
 			),
+			'customize_design'=>array(
+				
+				
+			),
 			'languages'=>array(
 				
 				

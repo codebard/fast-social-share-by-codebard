@@ -21,6 +21,7 @@ $lang = array(
 	'admin_menu_label' => 'Fast Social Share',
 	'admin_tab_dashboard' => 'Dashboard',
 	'admin_tab_social_networks' => 'Social Networks',
+	'admin_tab_customize_design' => 'Customize Design',
 	'admin_tab_sidebar_widgets' => 'Sidebar Widgets',
 	'admin_tab_addons' => 'Addons',
 	'admin_tab_support' => 'Support',
