@@ -64,6 +64,8 @@ class cb_p2_plugin extends cb_p2_core
 		
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'delete_social_network', array( &$this, 'delete_social_network' ),10,1 );
 		
+		add_action( 'wp_ajax_'.$this->internal['prefix'].'load_set_to_edit', array( &$this, 'load_set_to_edit' ),10,1 );
+		
 		// Add css to head in admin if the page is related to the design wizard
 		
 		if ( $_REQUEST['cb_p2_tab'] == 'customize_design' ) {
@@ -149,7 +151,14 @@ class cb_p2_plugin extends cb_p2_core
 		{
 			wp_enqueue_style( $this->internal['id'].'-css-admin', $this->internal['plugin_url'].'plugin/includes/css/admin.css' );
 			
-			
+			$wp_scripts = wp_scripts();
+			wp_enqueue_style(
+			  'jquery-ui-theme-smoothness',
+			  sprintf(
+				'//ajax.googleapis.com/ajax/libs/jqueryui/%s/themes/smoothness/jquery-ui.css', // working for https as well now
+				$wp_scripts->registered['jquery-ui-core']->ver
+			  )
+			);			
 		}		
 	}
 	public function enqueue_frontend_scripts_p()
@@ -159,8 +168,11 @@ class cb_p2_plugin extends cb_p2_core
 	public function enqueue_admin_scripts_p()
 	{
 		// This will enqueue the Media Uploader script
-		wp_enqueue_media();	
-		wp_enqueue_script( $this->internal['id'].'-js-admin', $this->internal['plugin_url'].'plugin/includes/scripts/admin.js' );	
+		wp_enqueue_media();
+		wp_enqueue_script('jquery');
+		wp_enqueue_script('jquery-ui-core');
+		wp_enqueue_script('jquery-ui-slider');
+		wp_enqueue_script( $this->internal['id'].'-js-admin', $this->internal['plugin_url'].'plugin/includes/scripts/admin.js' );
 			
 	}
 	public function upgrade_p($v1,$v2=false)
@@ -1041,6 +1053,40 @@ class cb_p2_plugin extends cb_p2_core
 	public function get_share_button_content_p( $network, $url, $text_before, $text_after ) {
 		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'">'.$text_after.'</a>';		
 	}
+	public function make_design_editor_p(  ) {
+		
+		$sets = '';
+		
+		$selected_set = $this->opt['set'];
+		
+		if ( isset( $_REQUEST['cb_p2_set'] ) ) {
+			$selected_set = $_REQUEST['cb_p2_set'];		
+		}
+		
+		foreach ( $this->opt['styles'] as $key => $value ) {
+			
+			$set_name = $key;
+			
+			$selected = '';
+			
+			if( isset( $this->lang[$key] ) ) {
+				
+				$set_name = $this->lang[$key];
+				
+			}
+			
+			if ( $key == $selected_set ) {
+				$selected = 'selected';
+			}
+			
+			
+			$sets .= '<option value="'.$key.'" '.$selected.'>'.$set_name.'</option>';			
+			
+		}
+		
+		return '<div id="cb_p2_design_editor"><form action="" method="post"><select id="cb_p2_set_selector" name="cb_p2_set">'.$sets.'</select><input class="cb_p2_social_network_edit_button" type="submit" value="Preview" style="font-size:18px;"></form></div>';		
+	}
+
 	
 	public function add_post_buttons_p( $content ) {
 		
@@ -1127,63 +1173,70 @@ class cb_p2_plugin extends cb_p2_core
 	
 	}
 	public function add_css_to_head_p() {
+		
+
+		$set = $this->opt['set'];
+		if ( current_user_can('manage_options') AND isset( $_REQUEST['cb_p2_set'] ) ) {
+			$set = $_REQUEST['cb_p2_set'];
+		}
+			
 
 		echo '<style>
 		
 		
 			.cb_p2_share_container {
 				display: inline-table;
-				width : '.$this->opt['style']['button_container_width'].';
+				width : '.$this->opt['styles'][$set]['button_container_width'].';
 				clear:both;
-				margin-top:'.$this->opt['style']['button_container_margin_top'].';
+				margin-top:'.$this->opt['styles'][$set]['button_container_margin_top'].';
 			}
 
 		
 			.cb_p2_social_share {
-				padding-left: '.$this->opt['style']['button_container_padding_left'].';
+				padding-left: '.$this->opt['styles'][$set]['button_container_padding_left'].';
 				list-style: none; 
-				text-align : '.$this->opt['style']['button_container_text_align'].';
+				text-align : '.$this->opt['styles'][$set]['button_container_text_align'].';
 			}
 
 			.cb_p2_social_share_item {
 				display: inline;
-				font-size : '.$this->opt['style']['button_font_size'].'em;
+				font-size : '.$this->opt['styles'][$set]['button_font_size'].'em;
 			}
 	
 			.cb_p2_social_share_follow_item {
 				display: inline;
-				font-size : '.$this->opt['style']['follow_button_icon_size'].'px;
+				font-size : '.$this->opt['styles'][$set]['follow_button_icon_size'].'px;
 			}
 	
 			.cb_p2_social_share_link {
 			
-				text-decoration: '.$this->opt['style']['button_text_decoration'].';
-				color: '.$this->opt['style']['button_link_color'].';
-				font-weight: '.$this->opt['style']['button_font_weight'].';
-				padding: .3em .45em .3em '.($this->opt['style']['button_icon_size']+8).'px;
-				background-color: '.$this->opt['style']['button_background_color'].';
-				border: '.$this->opt['style']['button_border_thickness'].'px '.$this->opt['style']['button_border_style'].' '.$this->opt['style']['button_border_color'].';
+				text-decoration: '.$this->opt['styles'][$set]['button_text_decoration'].';
+				color: '.$this->opt['styles'][$set]['button_link_color'].';
+				font-weight: '.$this->opt['styles'][$set]['button_font_weight'].';
+				padding: .3em .45em .3em '.($this->opt['styles'][$set]['button_icon_size']+8).'px;
+				background-color: '.$this->opt['styles'][$set]['button_background_color'].';
+				border: '.$this->opt['styles'][$set]['button_border_thickness'].'px '.$this->opt['styles'][$set]['button_border_style'].' '.$this->opt['styles'][$set]['button_border_color'].';
 				display: inline-block;
-				background-size: '.$this->opt['style']['button_icon_size'].'px '.$this->opt['style']['button_icon_size'].'px;
+				background-size: '.$this->opt['styles'][$set]['button_icon_size'].'px '.$this->opt['styles'][$set]['button_icon_size'].'px;
 				background-repeat: no-repeat;
 				background-position: 5px center;
-				margin: '.$this->opt['style']['button_margin'].'em;
+				margin: '.$this->opt['styles'][$set]['button_margin'].'em;
 			  
 			  }
 			  
 			.cb_p2_social_share_follow_link {
 			
-				text-decoration: '.$this->opt['style']['button_text_decoration'].';
-				color: '.$this->opt['style']['button_link_color'].';
-				font-weight: '.$this->opt['style']['button_font_weight'].';
-				padding: '.$this->opt['style']['button_padding'].';
-				background-color: '.$this->opt['style']['button_background_color'].';
-				border: '.$this->opt['style']['button_border_thickness'].'px '.$this->opt['style']['button_border_style'].' '.$this->opt['style']['button_border_color'].';
+				text-decoration: '.$this->opt['styles'][$set]['button_text_decoration'].';
+				color: '.$this->opt['styles'][$set]['button_link_color'].';
+				font-weight: '.$this->opt['styles'][$set]['button_font_weight'].';
+				padding: '.$this->opt['styles'][$set]['button_padding'].';
+				background-color: '.$this->opt['styles'][$set]['button_background_color'].';
+				border: '.$this->opt['style']['button_border_thickness'].'px '.$this->opt['styles'][$set]['button_border_style'].' '.$this->opt['styles'][$set]['button_border_color'].';
 				display: inline-block;
-				background-size: '.$this->opt['style']['follow_button_icon_size'].'px '.$this->opt['style']['follow_button_icon_size'].'px;
+				background-size: '.$this->opt['styles'][$set]['follow_button_icon_size'].'px '.$this->opt['styles'][$set]['follow_button_icon_size'].'px;
 				background-repeat: no-repeat;
 				background-position: 5px center;
-				margin: '.$this->opt['style']['button_margin'].'em;
+				margin: '.$this->opt['styles'][$set]['button_margin'].'em;
 			  
 			  }			  
 			  
@@ -1206,13 +1259,35 @@ class cb_p2_plugin extends cb_p2_core
 	
 	public function get_share_button_css_p( $network ) {
 		
+		
+		$set = $this->opt['set'];
+		if ( current_user_can('manage_options') AND isset( $_REQUEST['cb_p2_set'] ) ) {
+			$set = $_REQUEST['cb_p2_set'];
+		}
+	
 		return '			.cb_p2_social_share_button_'.$network.' {
-				background-image: url("'.$this->internal['plugin_url'].'plugin/images/'.$this->opt['style']['icon_set'].'/'.$network.'/'.$this->opt['style']['button_icon_size'].'.png");
+				background-image: url("'.$this->internal['plugin_url'].'plugin/images/'.$set.'/'.$network.'/'.$this->opt['style']['button_icon_size'].'.png");
 				}';
 
 	}
 	
 	
+	public function load_set_to_edit_p() {
+	
+		// Loads an icon set to edit its styles.
+		
+		if ( !current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		
+		$requested_set = $_REQUEST['cb_p2_selected_set'];
+		
+		
+		
+		wp_die();
+		
+	
+	}
 	public function social_network_add_update_p() {
 	
 		// Adds/updates social network

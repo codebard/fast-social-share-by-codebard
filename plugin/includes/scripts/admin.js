@@ -47,6 +47,39 @@ jQuery(document).ready(function($) {
 		});
 		
 	});
+	jQuery(document).on( 'click', "#cb_p2_customize_set_button", function (e) {
+		e.preventDefault();
+		var cb_p2_input_target = document.getElementById(jQuery(this).attr('target'));
+		var cb_p2_selected_set = jQuery('#cb_p2_set_selector').val();
+		console.log(cb_p2_selected_set);
+		jQuery(cb_p2_input_target).empty();
+		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Processing...</div>');	
+
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'cb_p2_load_set_to_edit',
+				cb_p2_selected_set: cb_p2_selected_set,
+			},
+			success: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+			},
+			error: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+			},
+			statusCode: {
+				500: function(error) {
+					jQuery(cb_p2_input_target).empty();
+					jQuery(cb_p2_input_target).html(error);
+				}
+			}
+		});
+		
+	});
 	jQuery(document).on( 'click', "#cb_p2_delete_network_button", function (e) {
 		e.preventDefault();
 		var cb_p2_input_target = document.getElementById(jQuery(this).attr('ajax_target_div'));
@@ -304,4 +337,39 @@ jQuery(document).ready(function($) {
 	
 	});
 	
+		jQuery("#slider").slider({
+		max: 100,
+		step:1, 
+		change: function(event, ui) {
+			jQuery(".edit_form input[name='number']").val( ui.value );
+		}
+	});
+	
+	$("#slider-2").slider({
+		min: 1,
+		max: 5,
+		value: 1,
+		step: 1,
+		animate:"slow",
+		orientation: "horizontal",
+		slide: function( event, ui ) {
+			// Convert value to index
+			$("span[data-step]").hide()
+			$("span[data-step='" + ui.value + "']").show()
+		}
+	});
+
+    jQuery("#ageRangeSlider").slider({
+      value: 10,
+      min: 0,
+      max: 100,
+      step: 10,
+      slide: function(event, ui) {
+        $("#yourAgeRange").val(ui.value);
+      }
+    });
+    jQuery("#yourAgeRange").val($("#ageRangeSlider").slider("value"));	
+	
 });
+
+

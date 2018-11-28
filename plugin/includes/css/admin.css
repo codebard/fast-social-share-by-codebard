@@ -578,3 +578,33 @@ font-weight:bold;
 	margin-bottom: 20px;
 	
 }
+
+
+#cb_p2_design_editor{
+	
+	display:block;
+	margin:20px;
+	
+}
+#cb_p2_set_editor{
+	
+	display:block;
+	margin:20px;
+	
+}
+
+#cb_p2_design_editor select {
+    min-width:125px;
+    min-height: 45px;
+    border-width: 3px;
+    border-color: rgba(50, 50, 50, 0.14);
+    margin: 10px 10px 10px 0px;
+	font-size: 18px;
+}
+
+#slider {
+	
+	width : 100%;
+	max-width : 300px;
+	
+}

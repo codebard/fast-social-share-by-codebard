@@ -102,6 +102,13 @@ $lang = array(
 	'social_networks_follow' => 'Follow URL of your account at the social network, if it exists',
 	'social_networks_sort' => 'Sort order of the social network. Smaller numbers will show up before bigger numbers',
 	'social_networks_select_network' => 'Select Social Network to edit',
+	
+	'set_1' => 'Button set 1',
+	'set_2' => 'Button set 2',
+	'set_3' => 'Button set 3',
+	'set_4' => 'Button set 4',
+	'set_5' => 'Button set 5',
+	'set_6' => 'Button set 6',
 
 );
 
