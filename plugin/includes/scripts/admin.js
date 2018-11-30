@@ -3,7 +3,7 @@ jQuery.noConflict(); // Reverts '$' variable back to other JS libraries
 jQuery(document).ready(function($) {
 
 	jQuery('body').on("click",'.cb_p2_admin_toggle_button',function(e) {
-		target_div = document.getElementById($(this).attr( 'target' ));
+		target_div = document.getElementById(jQuery(this).attr( 'target' ));
 		jQuery(target_div).fadeToggle(1800);
 	});
 	
@@ -51,7 +51,6 @@ jQuery(document).ready(function($) {
 		e.preventDefault();
 		var cb_p2_input_target = document.getElementById(jQuery(this).attr('target'));
 		var cb_p2_selected_set = jQuery('#cb_p2_set_selector').val();
-		console.log(cb_p2_selected_set);
 		jQuery(cb_p2_input_target).empty();
 		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Processing...</div>');	
 
@@ -337,38 +336,63 @@ jQuery(document).ready(function($) {
 	
 	});
 	
-		jQuery("#slider").slider({
-		max: 100,
-		step:1, 
-		change: function(event, ui) {
-			jQuery(".edit_form input[name='number']").val( ui.value );
+    jQuery(".cb_p2_value_slider").slider({
+		value: 1,
+		min: 1,
+		max: 1,
+		step: 1,
+		create: function( event, ui ) {
+			
+			// Get slider target input element
+			cb_p2_slider_value_target = document.getElementById(jQuery(this).attr('slider_value_target'));
+					
+			// Set the values of the slider with the values determined in target input
+			
+			jQuery(this).slider( "option", "max", parseInt(jQuery(cb_p2_slider_value_target).attr('max')));
+			jQuery(this).slider( "option", "min", parseInt(jQuery(cb_p2_slider_value_target).attr('min')));
+			jQuery(this).slider( "option", "step", parseInt(jQuery(cb_p2_slider_value_target).attr('step')));
+			jQuery(this).slider( "value", jQuery(cb_p2_slider_value_target).val());
+			
+			
+		},
+		slide: function(event, ui) {
+			
+			var cb_p2_slider_value_target = document.getElementById(jQuery(this).attr('slider_value_target'));
+			jQuery(cb_p2_slider_value_target).val(ui.value);
+			jQuery(jQuery(cb_p2_slider_value_target).attr('css_target_element')).css(jQuery(cb_p2_slider_value_target).attr('css_rule'),jQuery(cb_p2_slider_value_target).val()+jQuery(cb_p2_slider_value_target).attr('css_suffix'));
+			
 		}
+    });
+	
+	
+	jQuery(document).on('input', '.cb_p2_slider_input_value', function(e) {
+		
+		
+		jQuery(jQuery(this).attr('css_target_element')).css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
+ 
+		jQuery(document.getElementById(jQuery(this).attr('parent_slider'))).slider( "value", jQuery(this).val());
+	
+		
 	});
 	
-	$("#slider-2").slider({
-		min: 1,
-		max: 5,
-		value: 1,
-		step: 1,
-		animate:"slow",
-		orientation: "horizontal",
-		slide: function( event, ui ) {
-			// Convert value to index
-			$("span[data-step]").hide()
-			$("span[data-step='" + ui.value + "']").show()
-		}
+	jQuery(document).on('change', '.cb_p2_select_input', function(e) {
+		
+		jQuery(jQuery(this).attr('css_target_element')).css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
+	});
+	
+
+	jQuery('.cb_p2_color_picker').each(function(){
+		jQuery(this).wpColorPicker({
+			hide: true,
+			change: function(event, ui){
+				jQuery(jQuery(this).attr('css_target_element')).css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
+			}
+			
+			
+		});
 	});
 
-    jQuery("#ageRangeSlider").slider({
-      value: 10,
-      min: 0,
-      max: 100,
-      step: 10,
-      slide: function(event, ui) {
-        $("#yourAgeRange").val(ui.value);
-      }
-    });
-    jQuery("#yourAgeRange").val($("#ageRangeSlider").slider("value"));	
+	
 	
 });
 

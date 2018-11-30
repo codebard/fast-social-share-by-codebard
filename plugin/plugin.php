@@ -68,8 +68,9 @@ class cb_p2_plugin extends cb_p2_core
 		
 		// Add css to head in admin if the page is related to the design wizard
 		
-		if ( $_REQUEST['cb_p2_tab'] == 'customize_design' ) {
+		if ( isset( $_REQUEST['cb_p2_tab'] ) AND $_REQUEST['cb_p2_tab'] == 'customize_design' ) {
 			add_action('admin_head', array(&$this, 'add_css_to_head'));
+			
 		}
 				
 	}
@@ -151,14 +152,19 @@ class cb_p2_plugin extends cb_p2_core
 		{
 			wp_enqueue_style( $this->internal['id'].'-css-admin', $this->internal['plugin_url'].'plugin/includes/css/admin.css' );
 			
-			$wp_scripts = wp_scripts();
-			wp_enqueue_style(
-			  'jquery-ui-theme-smoothness',
-			  sprintf(
-				'//ajax.googleapis.com/ajax/libs/jqueryui/%s/themes/smoothness/jquery-ui.css', // working for https as well now
-				$wp_scripts->registered['jquery-ui-core']->ver
-			  )
-			);			
+			if ( isset( $_REQUEST['cb_p2_tab'] ) AND $_REQUEST['cb_p2_tab'] == 'customize_design' ) {
+				
+				$wp_scripts = wp_scripts();
+				wp_enqueue_style(
+				  'jquery-ui-theme-smoothness',
+				  sprintf(
+					'//ajax.googleapis.com/ajax/libs/jqueryui/%s/themes/smoothness/jquery-ui.css', // working for https as well now
+					$wp_scripts->registered['jquery-ui-core']->ver
+				  )
+				);
+				wp_enqueue_style( 'wp-color-picker');
+			}
+			
 		}		
 	}
 	public function enqueue_frontend_scripts_p()
@@ -168,12 +174,17 @@ class cb_p2_plugin extends cb_p2_core
 	public function enqueue_admin_scripts_p()
 	{
 		// This will enqueue the Media Uploader script
-		wp_enqueue_media();
-		wp_enqueue_script('jquery');
-		wp_enqueue_script('jquery-ui-core');
-		wp_enqueue_script('jquery-ui-slider');
-		wp_enqueue_script( $this->internal['id'].'-js-admin', $this->internal['plugin_url'].'plugin/includes/scripts/admin.js' );
-			
+		
+
+		if ( isset( $_REQUEST['cb_p2_tab'] ) AND $_REQUEST['cb_p2_tab'] == 'customize_design' ) {
+				
+			wp_enqueue_media();
+			wp_enqueue_script('jquery');
+			wp_enqueue_script('jquery-ui-core');
+			wp_enqueue_script('jquery-ui-slider');
+			wp_enqueue_script( 'wp-color-picker');
+			wp_enqueue_script( $this->internal['id'].'-js-admin', $this->internal['plugin_url'].'plugin/includes/scripts/admin.js' );
+		}	
 	}
 	public function upgrade_p($v1,$v2=false)
 	{
@@ -1051,15 +1062,49 @@ class cb_p2_plugin extends cb_p2_core
 	}
 	
 	public function get_share_button_content_p( $network, $url, $text_before, $text_after ) {
-		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'">'.$text_after.'</a>';		
+		
+		$selected_set = $this->opt['set'];
+		
+		if ( isset( $_REQUEST['cb_p2_set'] ) AND current_user_can('manage_options')  ) {
+			$selected_set = $_REQUEST['cb_p2_set'];		
+		}
+		
+		$sizes = array(
+			'16',
+			'20',
+			'24',
+			'28',
+			'32',
+			'36',
+			'42',
+			'48',
+			'64',		
+		);
+		
+		$closest_icon_size = $this->get_closest($this->opt['style']['button_icon_size'],$sizes);
+		
+		
+		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'"><img src="'.$this->internal['plugin_url'].'plugin/images/'.$selected_set.'/'.$network.'/'.$closest_icon_size.'.png" style="width:'.$this->opt['style']['button_icon_size'].'px; height:'.$this->opt['style']['button_icon_size'].'px;" /><div class="cb_p2_social_share_link_text">'.$text_after.'</div></a>';		
 	}
-	public function make_design_editor_p(  ) {
+	public function get_closest($search, $arr) {
+		// Gets closest value from an array to a given value
+		// credit:
+		// https://stackoverflow.com/a/5464961/1792090
+	   $closest = null;
+	   foreach ($arr as $item) {
+		  if ($closest === null || abs($search - $closest) > abs($item - $search)) {
+			 $closest = $item;
+		  }
+	   }
+	   return $closest;
+	}
+	public function make_design_selector_p(  ) {
 		
 		$sets = '';
 		
 		$selected_set = $this->opt['set'];
 		
-		if ( isset( $_REQUEST['cb_p2_set'] ) ) {
+		if ( isset( $_REQUEST['cb_p2_set'] ) AND current_user_can('manage_options') ) {
 			$selected_set = $_REQUEST['cb_p2_set'];		
 		}
 		
@@ -1117,8 +1162,8 @@ class cb_p2_plugin extends cb_p2_core
 				continue;
 			}
 			 
-			$shares .= '<li class="cb_p2_social_share_item">';	
-			$follows .= '<li class="cb_p2_social_share_item">';	
+			$shares .= '<div class="cb_p2_social_share_item">';	
+			$follows .= '<div class="cb_p2_social_share_item">';	
 		
 			
 			$processed_url=str_replace('{CONTENTTITLE}',$share_title,$current['url']);
@@ -1147,14 +1192,14 @@ class cb_p2_plugin extends cb_p2_core
 				}			
 				$follows .= '<a class="cb_p2_social_share_link cb_p2_social_share_button_'.$key.'" href="'.$current['follow'].'" rel="nofollow" target="'.$this->opt['functionality']['follow_link_target'].'">&nbsp;</a>';	
 			}
-			$shares .= '</li>';				
-			$follows .= '</li>';				
+			$shares .= '</div>';				
+			$follows .= '</div>';				
 			
 	
 		
 		}
-		$shares.='</ul></div>';
-		$follows.='</ul></div>';
+		$shares.='</div></div>';
+		$follows.='</div></div>';
 		
 		return $content.$shares.$follows;
 			
@@ -1162,16 +1207,6 @@ class cb_p2_plugin extends cb_p2_core
 
 	}
 
-	public function add_css_to_head2_p() {
-	echo '<style>
-		
-		.cb_p2_share_container {
-				display: inline-table;
-			}
-			
-			</style>';
-	
-	}
 	public function add_css_to_head_p() {
 		
 
@@ -1199,8 +1234,8 @@ class cb_p2_plugin extends cb_p2_core
 			}
 
 			.cb_p2_social_share_item {
-				display: inline;
-				font-size : '.$this->opt['styles'][$set]['button_font_size'].'em;
+				display: inline-table;
+				margin: '.$this->opt['styles'][$set]['button_margin'].'px;
 			}
 	
 			.cb_p2_social_share_follow_item {
@@ -1209,19 +1244,31 @@ class cb_p2_plugin extends cb_p2_core
 			}
 	
 			.cb_p2_social_share_link {
-			
+				font-size : '.$this->opt['styles'][$set]['button_font_size'].'px;			
 				text-decoration: '.$this->opt['styles'][$set]['button_text_decoration'].';
 				color: '.$this->opt['styles'][$set]['button_link_color'].';
 				font-weight: '.$this->opt['styles'][$set]['button_font_weight'].';
-				padding: .3em .45em .3em '.($this->opt['styles'][$set]['button_icon_size']+8).'px;
+				padding: '.$this->opt['styles'][$set]['button_padding'].'px;
 				background-color: '.$this->opt['styles'][$set]['button_background_color'].';
-				border: '.$this->opt['styles'][$set]['button_border_thickness'].'px '.$this->opt['styles'][$set]['button_border_style'].' '.$this->opt['styles'][$set]['button_border_color'].';
-				display: inline-block;
-				background-size: '.$this->opt['styles'][$set]['button_icon_size'].'px '.$this->opt['styles'][$set]['button_icon_size'].'px;
-				background-repeat: no-repeat;
-				background-position: 5px center;
-				margin: '.$this->opt['styles'][$set]['button_margin'].'em;
+				border-width: '.$this->opt['styles'][$set]['button_border_thickness'].'px;
+				border-radius: '.$this->opt['styles'][$set]['button_border_radius'].'px;
+				border-style:  '.$this->opt['styles'][$set]['button_border_style'].';
+				border-color:  '.$this->opt['styles'][$set]['button_border_color'].';
+				display: table-cell;
+				vertical-align: middle;
 			  
+			  }
+			  
+			  .cb_p2_social_share_link_text{
+				
+				  display:inline-block;
+				  vertical-align:middle;  
+			  }
+			  
+			  .cb_p2_social_share_link img {
+				  display:inline-block;
+				  vertical-align:middle;
+				  margin-right:'.ceil($this->opt['styles'][$set]['button_font_size']/2).'px;
 			  }
 			  
 			.cb_p2_social_share_follow_link {
@@ -1229,14 +1276,14 @@ class cb_p2_plugin extends cb_p2_core
 				text-decoration: '.$this->opt['styles'][$set]['button_text_decoration'].';
 				color: '.$this->opt['styles'][$set]['button_link_color'].';
 				font-weight: '.$this->opt['styles'][$set]['button_font_weight'].';
-				padding: '.$this->opt['styles'][$set]['button_padding'].';
+				padding: '.$this->opt['styles'][$set]['button_padding'].'px;
 				background-color: '.$this->opt['styles'][$set]['button_background_color'].';
 				border: '.$this->opt['style']['button_border_thickness'].'px '.$this->opt['styles'][$set]['button_border_style'].' '.$this->opt['styles'][$set]['button_border_color'].';
 				display: inline-block;
 				background-size: '.$this->opt['styles'][$set]['follow_button_icon_size'].'px '.$this->opt['styles'][$set]['follow_button_icon_size'].'px;
 				background-repeat: no-repeat;
 				background-position: 5px center;
-				margin: '.$this->opt['styles'][$set]['button_margin'].'em;
+				margin: '.$this->opt['styles'][$set]['button_margin'].'px;
 			  
 			  }			  
 			  
@@ -1249,28 +1296,10 @@ class cb_p2_plugin extends cb_p2_core
 			}
 			
 			';
-			
-			foreach($this->opt['social_networks'] as $key => $value) {
-				echo $this->get_share_button_css($key);
-
-			}
+						
 			echo '</style>';
 	}
-	
-	public function get_share_button_css_p( $network ) {
 		
-		
-		$set = $this->opt['set'];
-		if ( current_user_can('manage_options') AND isset( $_REQUEST['cb_p2_set'] ) ) {
-			$set = $_REQUEST['cb_p2_set'];
-		}
-	
-		return '			.cb_p2_social_share_button_'.$network.' {
-				background-image: url("'.$this->internal['plugin_url'].'plugin/images/'.$set.'/'.$network.'/'.$this->opt['style']['button_icon_size'].'.png");
-				}';
-
-	}
-	
 	
 	public function load_set_to_edit_p() {
 	
@@ -1281,7 +1310,6 @@ class cb_p2_plugin extends cb_p2_core
 		}
 		
 		$requested_set = $_REQUEST['cb_p2_selected_set'];
-		
 		
 		
 		wp_die();
@@ -1461,10 +1489,312 @@ class cb_p2_plugin extends cb_p2_core
 		wp_die();
 
 	}
-	public function make_social_network_list_p() {
+	public function make_style_editor_p() {
 		
 		// Makes social network selection list for admin
 		
+		if ( !current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		
+		$set = $this->opt['set'];
+		if ( isset( $_REQUEST['cb_p2_set'] ) ) {
+			$set = $_REQUEST['cb_p2_set'];
+		}
+		
+		echo '<div id="cb_p2_style_editor_items">';
+		
+		
+		echo '<div class="cb_p2_style_editor_item">';
+		
+		$args = array(
+			'title' => 'Button text size',
+			'desc' => 'Controls the font size on the buttons',
+			'name' => 'button_font_size',
+			'input_id' => 'cb_p2_style_editor_button_font_size',
+			'slider_id' => 'cb_p2_value_slider_1',
+			'min' => 1,
+			'max' => 64,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['button_font_size'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => 'font-size',
+			'css_suffix' => 'px',
+			'size' => 1,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+		
+
+		$args = array(
+			'title' => 'Button text color',
+			'desc' => 'Change the color of the button text',
+			'name' => 'button_link_color',
+			'input_id' => 'cb_p2_style_editor_button_link_color',
+			'value' => $this->opt['styles'][$set]['button_link_color'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => 'color',
+			'css_suffix' => '',
+			'size' => 1,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_color_element($args);	
+
+
+		$args = array(
+			'title' => 'Button text boldness',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'button_font_weight',
+			'input_id' => 'cb_p2_style_editor_button_button_font_weight',
+			'slider_id' => 'cb_p2_value_slider_3',
+			'min' => 100,
+			'max' => 900,
+			'step' => 100,
+			'value' => $this->opt['styles'][$set]['button_font_weight'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => 'font-weight',
+			'css_suffix' => '',
+			'size' => 3,
+			'maxlength' => 3
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+
+
+		$selections = array(
+			'underline'  => 'Underline',
+			'overline'  => 'Overline',
+			'line-through' => 'Line-through',
+			'none' => 'None',
+		
+		);
+
+		$args = array(
+			'title' => 'Button text decoration',
+			'desc' => 'Change the color of the button borders',
+			'name' => 'button_text_decoration',
+			'input_id' => 'cb_p2_style_editor_button_text_decoration',
+			'selections' => $selections,
+			'value' => $this->opt['styles'][$set]['button_text_decoration'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => 'text-decoration',
+			'css_suffix' => '',	
+		
+		);
+		
+		echo $this->make_style_editor_select_element($args);		
+		
+		echo '</div>';
+		echo '<div class="cb_p2_style_editor_item">';
+		
+		$args = array(
+			'title' => 'Button border size',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'button_border_thickness',
+			'input_id' => 'cb_p2_style_editor_button_border_thickness',
+			'slider_id' => 'cb_p2_value_slider_2',
+			'min' => 0,
+			'max' => 10,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['button_border_thickness'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => 'border-width',
+			'css_suffix' => 'px',
+			'size' => 1,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+		
+
+		$args = array(
+			'title' => 'Button border color',
+			'desc' => 'Change the color of the button borders',
+			'name' => 'button_border_color',
+			'input_id' => 'cb_p2_style_editor_button_border_color',
+			'value' => $this->opt['styles'][$set]['button_border_color'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => 'border-color',
+			'css_suffix' => '',
+			'size' => 1,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_color_element($args);	
+		
+		$selections = array(
+			'solid'  => 'Solid',
+			'dotted' => 'Dotted',
+			'dashed' => 'Dashed',
+			'double' => 'Double',
+			'groove' => 'Groove',
+			'ridge' => 'Ridge',
+			'inset' => 'Inset',
+			'outset' => 'Outset',
+			'none' => 'None',
+			'hidden' => 'Hidden',
+		
+		);
+
+		$args = array(
+			'title' => 'Button border style',
+			'desc' => 'Change the color of the button borders',
+			'name' => 'button_border_style',
+			'input_id' => 'cb_p2_style_editor_button_border_style',
+			'selections' => $selections,
+			'value' => $this->opt['styles'][$set]['button_border_style'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => 'border-style',
+			'css_suffix' => '',	
+		
+		);
+		
+		echo $this->make_style_editor_select_element($args);
+		
+		$args = array(
+			'title' => 'Rounded button corners',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'button_border_radius',
+			'input_id' => 'cb_p2_style_editor_button_border_radius',
+			'slider_id' => 'cb_p2_value_slider_button_border_radius',
+			'min' => 0,
+			'max' => 50,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['button_border_radius'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => 'border-radius',
+			'css_suffix' => 'px',
+			'size' => 2,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+			
+		
+		echo '</div>';
+		echo '<div class="cb_p2_style_editor_item">';
+		
+		$args = array(
+			'title' => 'Button background color',
+			'desc' => 'Change the background color of the buttons',
+			'name' => 'button_background_color',
+			'input_id' => 'cb_p2_style_editor_button_background_color',
+			'value' => $this->opt['styles'][$set]['button_background_color'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => 'background-color',
+			'css_suffix' => '',
+			'size' => 1,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_color_element($args);
+		
+
+		$args = array(
+			'title' => 'Button margin',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'button_margin',
+			'input_id' => 'cb_p2_style_editor_button_button_margin',
+			'slider_id' => 'cb_p2_value_slider_button_margin',
+			'min' => 0,
+			'max' => 50,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['button_margin'],
+			'css_target_element' => '.cb_p2_social_share_item',
+			'css_rule' => 'margin',
+			'css_suffix' => 'px',
+			'size' => 2,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+
+		$args = array(
+			'title' => 'Button padding',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'button_padding',
+			'input_id' => 'cb_p2_style_editor_button_padding',
+			'slider_id' => 'cb_p2_value_slider_button_padding',
+			'min' => 0,
+			'max' => 50,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['button_padding'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => 'padding',
+			'css_suffix' => 'px',
+			'size' => 2,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+				
+		
+		
+		echo '</div>';
+		
+		echo '</div>';
+		
+	}
+	public function make_style_editor_select_element_p($args) {
+	
+		$element = '';
+	
+		$element .= '<div class="cb_p2_style_editor_item_label" for="'.$args['input_id'].'">'.$args['title'].'</div>
+			<select name="'.$args['name'].'" id="'.$args['input_id'].'" class="cb_p2_select_input" css_target_element="'.$args['css_target_element'].'" css_rule="'.$args['css_rule'].'" css_suffix="'.$args['css_suffix'].'">';
+			
+		foreach($args['selections'] as $key => $value){
+			
+			$selected = '';
+			
+			if($key == $args['value']) {
+				$selected = ' selected';
+			}
+			
+			$element .= '<option value="'.$key.'"'.$selected.'>'.$args['selections'][$key].'</option>';
+			
+		}	
+			
+		$element .= '</select>';
+		
+		return $element;
+		
+	}
+	public function make_style_editor_slider_element_p($args) {
+		
+		$element = '';
+	
+		$element .= '<div class="cb_p2_style_editor_item_label" for="'.$args['input_id'].'">'.$args['title'].'</div>
+			<input type="text" name="'.$args['name'].'" id="'.$args['input_id'].'" class="cb_p2_slider_input_value" value="'.$args['value'].'" min="'.$args['min'].'" max="'.$args['max'].'" step="'.$args['step'].'" css_target_element="'.$args['css_target_element'].'" css_rule="'.$args['css_rule'].'" css_suffix="'.$args['css_suffix'].'" parent_slider="'.$args['slider_id'].'" size="'.$args['size'].'" maxlength="'.$args['maxlength'].'" /> px
+			<br />
+			<br />
+			<div class="cb_p2_value_slider" id="'.$args['slider_id'].'" slider_value_target="'.$args['input_id'].'"></div>';
+		
+		
+		return $element;
+	}
+	public function make_style_editor_color_element_p($args) {
+		
+		$element = '';
+		
+		$element .= '<div class="cb_p2_style_editor_item_label" for="'.$args['input_id'].'">'.$args['title'].'</div>
+			<input class="cb_p2_color_picker" type="text" name="header_color" value="'.$args['value'].'"  css_target_element="'.$args['css_target_element'].'" css_rule="'.$args['css_rule'].'" css_suffix="'.$args['css_suffix'].'" />';
+		
+		return $element;
+	}
+	public function make_social_network_list_p() {
+		
+		// Makes social network selection list for admin
 		
 		if ( !current_user_can( 'manage_options' ) ) {
 			return;
