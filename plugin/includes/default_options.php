@@ -13,10 +13,20 @@ $this->opt = array_replace_recursive(
 			
 			#MARKER
 			
-			'set' => 'set_1',
+			'style_set' => 'set_1',
+			
+			'icon_sets' => array(
+				'set_1',
+				'set_2',
+				'set_3',
+				'set_4',
+				'set_5',
+				'set_6',
+			),
 			
 			'styles' => array(
 				'set_1' => array(
+					'icon_set' => 'set_1',
 					'button_background_color'=>'#f5f5f5',
 					'button_link_color'=>'#444',
 					'button_border_color'=>'#ccc',
@@ -37,6 +47,7 @@ $this->opt = array_replace_recursive(
 					
 				),
 				'set_2' => array(
+					'icon_set' => 'set_2',
 					'button_background_color'=>'#f5f5f5',
 					'button_link_color'=>'#444',
 					'button_border_color'=>'#ccc',
@@ -57,6 +68,7 @@ $this->opt = array_replace_recursive(
 					
 				),
 				'set_3' => array(
+					'icon_set' => 'set_3',
 					'button_background_color'=>'#f5f5f5',
 					'button_link_color'=>'#444',
 					'button_border_color'=>'transparent',
@@ -77,6 +89,7 @@ $this->opt = array_replace_recursive(
 					
 				),
 				'set_4' => array(
+					'icon_set' => 'set_4',
 					'button_background_color'=>'#f5f5f5',
 					'button_link_color'=>'#444',
 					'button_border_color'=>'#c0c0c0',
@@ -97,6 +110,7 @@ $this->opt = array_replace_recursive(
 					
 				),
 				'set_5' => array(
+					'icon_set' => 'set_3',
 					'button_background_color'=>'#f5f5f5',
 					'button_margin'=>'15',		
 					'button_icon_size'=>'24',
@@ -118,6 +132,7 @@ $this->opt = array_replace_recursive(
 					
 				),
 				'set_6' => array(
+					'icon_set' => 'set_6',
 					'button_background_color'=>'#f5f5f5',
 					'button_link_color'=>'#444',
 					'button_border_color'=>'transparent',

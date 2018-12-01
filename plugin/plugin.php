@@ -1084,7 +1084,7 @@ class cb_p2_plugin extends cb_p2_core
 		$closest_icon_size = $this->get_closest($this->opt['style']['button_icon_size'],$sizes);
 		
 		
-		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'"><img src="'.$this->internal['plugin_url'].'plugin/images/'.$selected_set.'/'.$network.'/'.$closest_icon_size.'.png" style="width:'.$this->opt['style']['button_icon_size'].'px; height:'.$this->opt['style']['button_icon_size'].'px;" /><div class="cb_p2_social_share_link_text">'.$text_after.'</div></a>';		
+		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'"><img src="'.$this->internal['plugin_url'].'plugin/images/'.$selected_set.'/'.$network.'/'.$closest_icon_size.'.png" id="cb_p2_icon_'.$network.'" style="width:'.$this->opt['style']['button_icon_size'].'px; height:'.$this->opt['style']['button_icon_size'].'px;" /><div class="cb_p2_social_share_link_text">'.$text_after.'</div></a>';		
 	}
 	public function get_closest($search, $arr) {
 		// Gets closest value from an array to a given value
@@ -1116,7 +1116,7 @@ class cb_p2_plugin extends cb_p2_core
 			
 			if( isset( $this->lang[$key] ) ) {
 				
-				$set_name = $this->lang[$key];
+				$set_name = $this->lang['style_'.$key];
 				
 			}
 			
@@ -1504,6 +1504,83 @@ class cb_p2_plugin extends cb_p2_core
 		
 		echo '<div id="cb_p2_style_editor_items">';
 		
+		// Icon properties
+		
+		echo '<div class="cb_p2_style_editor_item">';
+		
+		$icon_set_selection = array();
+		foreach ( $this->opt['icon_sets'] as $key => $value ){
+
+			$icon_set_selection[$this->opt['icon_sets'][$key]] = $this->lang[$this->opt['icon_sets'][$key]];
+			
+		}
+		
+		$networks_array = array();
+		
+		foreach ( $this->opt['social_networks'] as $key => $value ) {
+			$networks_array[$key] = $key;
+		}
+		
+		$extra_info = array(
+		
+			'icon_sets' => $this->opt['icon_sets'],
+			'social_networks' => $networks_array,
+			'plugin_url' => $this->internal['plugin_url'],
+			
+		);
+
+		$args = array(
+			'title' => 'Icon set',
+			'desc' => 'Change the color of the button borders',
+			'name' => 'icon_set',
+			'input_id' => 'cb_p2_icon_set_selector',
+			'input_class' => 'cb_p2_icon_set_selector',
+			'selections' => $icon_set_selection,
+			'value' => $this->opt['styles'][$set]['icon_set'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => '',
+			'css_suffix' => '',	
+			'extra_info' => base64_encode(json_encode($extra_info)),	
+		
+		);
+		
+		
+		echo $this->make_style_editor_select_element($args);
+
+		$icon_size_selection = array(
+			
+			'16' => '16',
+			'20' => '20',
+			'24' => '24',
+			'28' => '28',
+			'32' => '32',
+			'36' => '36',
+			'42' => '42',
+			'48' => '48',
+			'64' => '64',
+		
+		);
+		
+		$args = array(
+			'title' => 'Icon size',
+			'desc' => 'Change the color of the button borders',
+			'name' => 'button_icon_size',
+			'input_id' => 'cb_p2_button_icon_size_selector',
+			'input_class' => 'cb_p2_button_icon_size_selector',
+			'selections' => $icon_size_selection,
+			'value' => $this->opt['styles'][$set]['button_icon_size'],
+			'css_target_element' => '.cb_p2_social_share_link img',
+			'css_rule' => 'width',
+			'css_suffix' => 'px',
+			'extra_info' => base64_encode(json_encode($extra_info)),	
+		
+		);
+		
+		
+		echo $this->make_style_editor_select_element($args);	
+		
+		echo '</div>';
+			
 		
 		echo '<div class="cb_p2_style_editor_item">';
 		
@@ -1680,7 +1757,13 @@ class cb_p2_plugin extends cb_p2_core
 			
 		
 		echo '</div>';
+		
+		// Button properties
+		
+		
 		echo '<div class="cb_p2_style_editor_item">';
+		
+		
 		
 		$args = array(
 			'title' => 'Button background color',
@@ -1738,8 +1821,6 @@ class cb_p2_plugin extends cb_p2_core
 		);
 		
 		echo $this->make_style_editor_slider_element($args);
-				
-		
 		
 		echo '</div>';
 		
@@ -1749,9 +1830,19 @@ class cb_p2_plugin extends cb_p2_core
 	public function make_style_editor_select_element_p($args) {
 	
 		$element = '';
+		
+		$input_class = 'cb_p2_select_input';
+		$extra_info = '';
+		
+		if ( isset( $args['input_class'] ) ) {
+			$input_class = $args['input_class'];
+		}
+		if ( isset( $args['extra_info'] ) ) {
+			$extra_info = $args['extra_info'];
+		}
 	
 		$element .= '<div class="cb_p2_style_editor_item_label" for="'.$args['input_id'].'">'.$args['title'].'</div>
-			<select name="'.$args['name'].'" id="'.$args['input_id'].'" class="cb_p2_select_input" css_target_element="'.$args['css_target_element'].'" css_rule="'.$args['css_rule'].'" css_suffix="'.$args['css_suffix'].'">';
+			<select name="'.$args['name'].'" id="'.$args['input_id'].'" class="'.$input_class.'" css_target_element="'.$args['css_target_element'].'" css_rule="'.$args['css_rule'].'" css_suffix="'.$args['css_suffix'].'" extra_info="'.$extra_info.'">';
 			
 		foreach($args['selections'] as $key => $value){
 			
@@ -1779,7 +1870,6 @@ class cb_p2_plugin extends cb_p2_core
 			<br />
 			<br />
 			<div class="cb_p2_value_slider" id="'.$args['slider_id'].'" slider_value_target="'.$args['input_id'].'"></div>';
-		
 		
 		return $element;
 	}
@@ -1819,17 +1909,13 @@ class cb_p2_plugin extends cb_p2_core
 			 
 		}
 
-		echo '<div class="'.$this->internal['prefix'].'social_network_edit_button '.$this->internal['prefix'].'social_network_edit" target="'.$this->internal['prefix'].'network_editor" network="add_new"><img src="'.$this->internal['plugin_url'].'plugin/images/set_1/add_network.png" style="width:20px; height:20px;" />Add New</div>';
+		echo '<div class="'.$this->internal['prefix'].'social_network_edit_button '.$this->internal['prefix'].'social_network_edit" target="'.$this->internal['prefix'].'network_editor" network="add_new"><img src="'.$this->internal['plugin_url'].'plugin/images/set_1/add_network.png" id="cb_p2_icon_'.$key.'" style="width:20px; height:20px;" />Add New</div>';
 		
 		echo '</div>';
 		if (defined('DOING_AJAX') && DOING_AJAX) {
 			wp_die();
 		}
 	}
-	
-
-	
-	
 }
 
 

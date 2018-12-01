@@ -388,8 +388,49 @@ jQuery(document).ready(function($) {
 				jQuery(jQuery(this).attr('css_target_element')).css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
 			}
 			
-			
 		});
+	});
+
+	jQuery(document).on('change', '#cb_p2_button_icon_size_selector', function(e) {
+		
+		var extra_info = JSON.parse(window.atob(jQuery(this).attr('extra_info')));
+		var set = jQuery('#cb_p2_icon_set_selector').val();
+		var button_size = jQuery('#cb_p2_button_icon_size_selector').val();
+		console.log(set);
+		console.log(button_size);
+		for (var key in extra_info['social_networks']) {
+			
+			var button = jQuery(document.getElementById('cb_p2_icon_'+key));
+			
+			jQuery(button).attr('src',extra_info['plugin_url']+'plugin/images/'+set+'/'+key+'/'+button_size+'.png');
+			
+			jQuery(button).css('width',button_size);
+			jQuery(button).css('height',button_size);
+		
+		}		
+	
+	});
+	
+	jQuery(document).on('change', '#cb_p2_icon_set_selector', function(e) {
+		
+		var extra_info = JSON.parse(window.atob(jQuery(this).attr('extra_info')));
+		var set = jQuery(this).val();
+		
+		// cb_p2_social_share_button_
+		
+		for (var key in extra_info['social_networks']) {
+			
+			var button = jQuery(document.getElementById('cb_p2_icon_'+key));
+			var button_size = jQuery(document.getElementById('cb_p2_button_icon_size_selector')).val();
+			
+			jQuery(button).attr('src',extra_info['plugin_url']+'plugin/images/'+set+'/'+key+'/'+button_size+'.png');
+			
+			jQuery(button).css('width',button_size);
+			jQuery(button).css('height',button_size);
+		
+		}
+		
+		// jQuery().css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
 	});
 
 	

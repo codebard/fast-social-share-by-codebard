@@ -103,12 +103,19 @@ $lang = array(
 	'social_networks_sort' => 'Sort order of the social network. Smaller numbers will show up before bigger numbers',
 	'social_networks_select_network' => 'Select Social Network to edit',
 	
-	'set_1' => 'Button set 1',
-	'set_2' => 'Button set 2',
-	'set_3' => 'Button set 3',
-	'set_4' => 'Button set 4',
-	'set_5' => 'Button set 5',
-	'set_6' => 'Button set 6',
+	'style_set_1' => 'Style Set 1',
+	'style_set_2' => 'Style Set 2',
+	'style_set_3' => 'Style Set 3',
+	'style_set_4' => 'Style Set 4',
+	'style_set_5' => 'Style Set 5',
+	'style_set_6' => 'Style Set 6',
+	
+	'set_1' => 'Icon set 1',
+	'set_2' => 'Icon set 2',
+	'set_3' => 'Icon set 3',
+	'set_4' => 'Icon set 4',
+	'set_5' => 'Icon set 5',
+	'set_6' => 'Icon set 6',
 
 );
 
