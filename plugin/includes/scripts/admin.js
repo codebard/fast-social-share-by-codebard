@@ -454,7 +454,7 @@ jQuery(document).ready(function($) {
 	
 	jQuery(document).on('change', '#cb_p2_style_editor_button_hover_text_decoration', function(e) {
 		
-		jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover cb_p2_social_share_link_text  {text-decoration:'+jQuery(this).val()+'; !important}</style>');
+		jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover .cb_p2_social_share_link_text  {text-decoration:'+jQuery(this).val()+'; !important}</style>');
 	
 	});	
 	
