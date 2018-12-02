@@ -1102,7 +1102,7 @@ class cb_p2_plugin extends cb_p2_core
 		
 		$sets = '';
 		
-		$selected_set = $this->opt['set'];
+		$selected_set = $this->opt['style_set'];
 		
 		if ( isset( $_REQUEST['cb_p2_set'] ) AND current_user_can('manage_options') ) {
 			$selected_set = $_REQUEST['cb_p2_set'];		
@@ -1210,7 +1210,7 @@ class cb_p2_plugin extends cb_p2_core
 	public function add_css_to_head_p() {
 		
 
-		$set = $this->opt['set'];
+		$set = $this->opt['style_set'];
 		if ( current_user_can('manage_options') AND isset( $_REQUEST['cb_p2_set'] ) ) {
 			$set = $_REQUEST['cb_p2_set'];
 		}
@@ -1221,16 +1221,24 @@ class cb_p2_plugin extends cb_p2_core
 		
 			.cb_p2_share_container {
 				display: inline-table;
-				width : '.$this->opt['styles'][$set]['button_container_width'].';
+				width : '.$this->opt['styles'][$set]['container_wrapper_width'].';
 				clear:both;
 				margin-top:'.$this->opt['styles'][$set]['button_container_margin_top'].';
 			}
 
 		
 			.cb_p2_social_share {
+				display: inline-block;
+				max-width : '.$this->opt['styles'][$set]['container_max_width'].'px;
+				width: 100%;
 				padding-left: '.$this->opt['styles'][$set]['button_container_padding_left'].';
 				list-style: none; 
 				text-align : '.$this->opt['styles'][$set]['button_container_text_align'].';
+				background-color: '.$this->opt['styles'][$set]['container_background_color'].';
+				border-width: '.$this->opt['styles'][$set]['container_border_thickness'].'px;
+				border-radius: '.$this->opt['styles'][$set]['container_border_radius'].'px;
+				border-style:  '.$this->opt['styles'][$set]['container_border_style'].';
+				border-color:  '.$this->opt['styles'][$set]['container_border_color'].';
 			}
 
 			.cb_p2_social_share_item {
@@ -1269,6 +1277,7 @@ class cb_p2_plugin extends cb_p2_core
 				  display:inline-block;
 				  vertical-align:middle;
 				  margin-right:'.ceil($this->opt['styles'][$set]['button_font_size']/2).'px;
+				  padding: '.$this->opt['styles'][$set]['button_icon_margin'].'px;
 			  }
 			  
 			.cb_p2_social_share_follow_link {
@@ -1287,13 +1296,13 @@ class cb_p2_plugin extends cb_p2_core
 			  
 			  }			  
 			  
-			.cb_p2_social_share_link:hover, 
-			.cb_p2_social_share_link:active, 
-			.cb_p2_social_share_link:focus 
+			.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover > *
 			{
-				color: #0000ff;
-				text-decoration : none;
+				text-decoration: '.$this->opt['styles'][$set]['button_hover_text_decoration'].';
+				color: '.$this->opt['styles'][$set]['button_link_hover_color'].';
+				background-color: '.$this->opt['styles'][$set]['button_hover_color'].';
 			}
+			
 			
 			';
 						
@@ -1497,7 +1506,7 @@ class cb_p2_plugin extends cb_p2_core
 			return;
 		}
 		
-		$set = $this->opt['set'];
+		$set = $this->opt['style_set'];
 		if ( isset( $_REQUEST['cb_p2_set'] ) ) {
 			$set = $_REQUEST['cb_p2_set'];
 		}
@@ -1577,7 +1586,28 @@ class cb_p2_plugin extends cb_p2_core
 		);
 		
 		
-		echo $this->make_style_editor_select_element($args);	
+		echo $this->make_style_editor_select_element($args);
+
+		
+		$args = array(
+			'title' => 'Icon spacing',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'button_margin',
+			'input_id' => 'cb_p2_style_editor_icon_margin',
+			'slider_id' => 'cb_p2_value_slider_icon_margin',
+			'min' => 0,
+			'max' => 50,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['button_icon_margin'],
+			'css_target_element' => '.cb_p2_social_share_item img',
+			'css_rule' => 'margin',
+			'css_suffix' => 'px',
+			'size' => 2,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
 		
 		echo '</div>';
 			
@@ -1612,6 +1642,22 @@ class cb_p2_plugin extends cb_p2_core
 			'input_id' => 'cb_p2_style_editor_button_link_color',
 			'value' => $this->opt['styles'][$set]['button_link_color'],
 			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => 'color',
+			'css_suffix' => '',
+			'size' => 1,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_color_element($args);
+	
+		$args = array(
+			'title' => 'Button text hover color',
+			'desc' => 'Change the color of the button text',
+			'name' => 'button_link_hover_color',
+			'input_id' => 'cb_p2_style_editor_button_link_hover_color',
+			'value' => $this->opt['styles'][$set]['button_link_hover_color'],
+			'css_target_element' => '.cb_p2_social_share_link:hover',
 			'css_rule' => 'color',
 			'css_suffix' => '',
 			'size' => 1,
@@ -1658,7 +1704,24 @@ class cb_p2_plugin extends cb_p2_core
 			'input_id' => 'cb_p2_style_editor_button_text_decoration',
 			'selections' => $selections,
 			'value' => $this->opt['styles'][$set]['button_text_decoration'],
-			'css_target_element' => '.cb_p2_social_share_link',
+			'css_target_element' => '.cb_p2_social_share_link_text',
+			'css_rule' => 'text-decoration',
+			'css_suffix' => '',	
+		
+		);
+		
+		echo $this->make_style_editor_select_element($args);		
+		
+		$args = array(
+			'title' => 'Button hover text decoration',
+			'desc' => 'Change the color of the button borders',
+			'name' => 'button_hover_text_decoration',
+			'input_id' => 'cb_p2_style_editor_button_hover_text_decoration',
+			'input_class' => 'cb_p2_style_editor_button_hover_text_decoration',
+			'selections' => $selections,
+			'value' => $this->opt['styles'][$set]['button_hover_text_decoration'],
+			// We target the below properties with jQuery on change in vain, because jquery doesnt manipulate psuedo elements. But they are here to make the change go dud.
+			'css_target_element' => '.cb_p2_social_share_link_text:hover',
 			'css_rule' => 'text-decoration',
 			'css_suffix' => '',	
 		
@@ -1764,7 +1827,6 @@ class cb_p2_plugin extends cb_p2_core
 		echo '<div class="cb_p2_style_editor_item">';
 		
 		
-		
 		$args = array(
 			'title' => 'Button background color',
 			'desc' => 'Change the background color of the buttons',
@@ -1781,9 +1843,25 @@ class cb_p2_plugin extends cb_p2_core
 		
 		echo $this->make_style_editor_color_element($args);
 		
+		$args = array(
+			'title' => 'Button hover color',
+			'desc' => 'Change the background color of the buttons',
+			'name' => 'button_hover_color',
+			'input_id' => 'cb_p2_style_editor_button_hover_color',
+			'value' => $this->opt['styles'][$set]['button_hover_color'],
+			'css_target_element' => '.cb_p2_social_share_link:hover',
+			'css_rule' => 'background-color',
+			'css_suffix' => '',
+			'size' => 1,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_color_element($args);
+		
 
 		$args = array(
-			'title' => 'Button margin',
+			'title' => 'Button spacing',
 			'desc' => 'Controls the border thickness of the buttons',
 			'name' => 'button_margin',
 			'input_id' => 'cb_p2_style_editor_button_button_margin',
@@ -1803,7 +1881,7 @@ class cb_p2_plugin extends cb_p2_core
 		echo $this->make_style_editor_slider_element($args);
 
 		$args = array(
-			'title' => 'Button padding',
+			'title' => 'Button internal spacing',
 			'desc' => 'Controls the border thickness of the buttons',
 			'name' => 'button_padding',
 			'input_id' => 'cb_p2_style_editor_button_padding',
@@ -1821,6 +1899,185 @@ class cb_p2_plugin extends cb_p2_core
 		);
 		
 		echo $this->make_style_editor_slider_element($args);
+		
+		echo '</div>';
+		
+		// Container properties
+		
+		echo '<div class="cb_p2_style_editor_item">';
+		
+		
+		$args = array(
+			'title' => 'Container background color',
+			'desc' => 'Change the background color of the buttons',
+			'name' => 'container_background_color',
+			'input_id' => 'cb_p2_style_editor_container_background_color',
+			'value' => $this->opt['styles'][$set]['container_background_color'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'background-color',
+			'css_suffix' => '',
+			'size' => 1,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_color_element($args);
+		
+
+
+		$args = array(
+			'title' => 'Container max width',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'container_max_width',
+			'input_id' => 'cb_p2_style_editor_container_max_width',
+			'slider_id' => 'cb_p2_value_slider_container_max_width',
+			'min' => 10,
+			'max' => 2000,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['container_max_width'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'max-width',
+			'css_suffix' => 'px',
+			'size' => 2,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);		
+		
+
+		$args = array(
+			'title' => 'Container spacing',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'container_margin',
+			'input_id' => 'cb_p2_style_editor_container_margin',
+			'slider_id' => 'cb_p2_value_slider_container_margin',
+			'min' => 0,
+			'max' => 70,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['container_margin'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'margin',
+			'css_suffix' => 'px',
+			'size' => 2,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+
+		$args = array(
+			'title' => 'Container internal spacing',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'container_padding',
+			'input_id' => 'cb_p2_style_editor_container_padding',
+			'slider_id' => 'cb_p2_value_slider_container_padding',
+			'min' => 0,
+			'max' => 70,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['container_padding'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'padding',
+			'css_suffix' => 'px',
+			'size' => 2,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+		
+		echo '</div>';
+		
+		// Container border 
+		
+		echo '<div class="cb_p2_style_editor_item">';
+		
+		
+		$args = array(
+			'title' => 'Container border size',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'container_border_thickness',
+			'input_id' => 'cb_p2_style_editor_container_border_thickness',
+			'slider_id' => 'cb_p2_value_slider_container_border_thickness',
+			'min' => 0,
+			'max' => 10,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['container_border_thickness'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'border-width',
+			'css_suffix' => 'px',
+			'size' => 1,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+		
+
+		$args = array(
+			'title' => 'Container border color',
+			'desc' => 'Change the color of the button borders',
+			'name' => 'container_border_color',
+			'input_id' => 'cb_p2_style_editor_container_border_color',
+			'value' => $this->opt['styles'][$set]['container_border_color'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'border-color',
+			'css_suffix' => '',
+			'size' => 1,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_color_element($args);	
+		
+		$selections = array(
+			'solid'  => 'Solid',
+			'dotted' => 'Dotted',
+			'dashed' => 'Dashed',
+			'double' => 'Double',
+			'groove' => 'Groove',
+			'ridge' => 'Ridge',
+			'inset' => 'Inset',
+			'outset' => 'Outset',
+			'none' => 'None',
+			'hidden' => 'Hidden',
+		
+		);
+
+		$args = array(
+			'title' => 'Container border style',
+			'desc' => 'Change the color of the button borders',
+			'name' => 'container_border_style',
+			'input_id' => 'cb_p2_style_editor_container_border_style',
+			'selections' => $selections,
+			'value' => $this->opt['styles'][$set]['container_border_style'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'border-style',
+			'css_suffix' => '',	
+		
+		);
+		
+		echo $this->make_style_editor_select_element($args);
+		
+		$args = array(
+			'title' => 'Container rounded corners',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'container_border_radius',
+			'input_id' => 'cb_p2_style_editor_container_border_radius',
+			'slider_id' => 'cb_p2_value_slider_container_border_radius',
+			'min' => 0,
+			'max' => 50,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['container_border_radius'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'border-radius',
+			'css_suffix' => 'px',
+			'size' => 2,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);		
 		
 		echo '</div>';
 		
@@ -1877,8 +2134,9 @@ class cb_p2_plugin extends cb_p2_core
 		
 		$element = '';
 		
+		
 		$element .= '<div class="cb_p2_style_editor_item_label" for="'.$args['input_id'].'">'.$args['title'].'</div>
-			<input class="cb_p2_color_picker" type="text" name="header_color" value="'.$args['value'].'"  css_target_element="'.$args['css_target_element'].'" css_rule="'.$args['css_rule'].'" css_suffix="'.$args['css_suffix'].'" />';
+			<input class="cb_p2_color_picker" id="'.$args['input_id'].'" type="text" name="header_color" value="'.$args['value'].'"  css_target_element="'.$args['css_target_element'].'" css_rule="'.$args['css_rule'].'" css_suffix="'.$args['css_suffix'].'" />';
 		
 		return $element;
 	}

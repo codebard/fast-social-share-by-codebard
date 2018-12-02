@@ -376,7 +376,9 @@ jQuery(document).ready(function($) {
 	});
 	
 	jQuery(document).on('change', '.cb_p2_select_input', function(e) {
-		
+		console.log(jQuery(this).attr('css_target_element'));
+		console.log(jQuery(this).attr('css_rule'));
+		console.log(jQuery(this).val());
 		jQuery(jQuery(this).attr('css_target_element')).css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
 	});
 	
@@ -385,7 +387,22 @@ jQuery(document).ready(function($) {
 		jQuery(this).wpColorPicker({
 			hide: true,
 			change: function(event, ui){
+				
+				// Exception for hover color change
+		
+				if(jQuery(this).attr('id') == 'cb_p2_style_editor_button_hover_color') {
+
+					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover > * {background-color:'+jQuery(this).val()+';} </style>');
+					return;
+				}
+				if(jQuery(this).attr('id') == 'cb_p2_style_editor_button_link_hover_color') {
+					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover > * {color:'+jQuery(this).val()+';}</style>');
+					return;
+				}
+				
+				
 				jQuery(jQuery(this).attr('css_target_element')).css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
+				
 			}
 			
 		});
@@ -425,14 +442,23 @@ jQuery(document).ready(function($) {
 			
 			jQuery(button).attr('src',extra_info['plugin_url']+'plugin/images/'+set+'/'+key+'/'+button_size+'.png');
 			
+			
 			jQuery(button).css('width',button_size);
 			jQuery(button).css('height',button_size);
 		
 		}
 		
-		// jQuery().css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
 	});
 
+	
+	
+	jQuery(document).on('change', '#cb_p2_style_editor_button_hover_text_decoration', function(e) {
+		
+		jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover > * {text-decoration:'+jQuery(this).val()+';}</style>');
+		console.log('a');
+		console.log(jQuery(this).val());
+	
+	});	
 	
 	
 });
