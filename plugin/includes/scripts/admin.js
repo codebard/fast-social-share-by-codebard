@@ -391,12 +391,12 @@ jQuery(document).ready(function($) {
 				// Exception for hover color change
 		
 				if(jQuery(this).attr('id') == 'cb_p2_style_editor_button_hover_color') {
-
-					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover > * {background-color:'+jQuery(this).val()+';} </style>');
+					// If we dont 'important' these rules, they get overridden if the non-hover rules are changed in style editor
+					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover {background-color:'+jQuery(this).val()+' !important;} </style>');
 					return;
 				}
 				if(jQuery(this).attr('id') == 'cb_p2_style_editor_button_link_hover_color') {
-					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover > * {color:'+jQuery(this).val()+';}</style>');
+					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover .cb_p2_social_share_link_text {color:'+jQuery(this).val()+' !important;}</style>');
 					return;
 				}
 				
@@ -454,9 +454,7 @@ jQuery(document).ready(function($) {
 	
 	jQuery(document).on('change', '#cb_p2_style_editor_button_hover_text_decoration', function(e) {
 		
-		jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover > * {text-decoration:'+jQuery(this).val()+';}</style>');
-		console.log('a');
-		console.log(jQuery(this).val());
+		jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover cb_p2_social_share_link_text  {text-decoration:'+jQuery(this).val()+'; !important}</style>');
 	
 	});	
 	

@@ -1252,7 +1252,7 @@ class cb_p2_plugin extends cb_p2_core
 			}
 	
 			.cb_p2_social_share_link {
-				font-size : '.$this->opt['styles'][$set]['button_font_size'].'px;			
+				font-size : '.$this->opt['styles'][$set]['button_font_size'].'px;
 				text-decoration: '.$this->opt['styles'][$set]['button_text_decoration'].';
 				color: '.$this->opt['styles'][$set]['button_link_color'].';
 				font-weight: '.$this->opt['styles'][$set]['button_font_weight'].';
@@ -1296,11 +1296,14 @@ class cb_p2_plugin extends cb_p2_core
 			  
 			  }			  
 			  
-			.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover > *
+			.cb_p2_social_share_link:hover
+			{
+				background-color: '.$this->opt['styles'][$set]['button_hover_color'].';
+			}
+			.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover .cb_p2_social_share_link_text
 			{
 				text-decoration: '.$this->opt['styles'][$set]['button_hover_text_decoration'].';
 				color: '.$this->opt['styles'][$set]['button_link_hover_color'].';
-				background-color: '.$this->opt['styles'][$set]['button_hover_color'].';
 			}
 			
 			
@@ -1850,7 +1853,7 @@ class cb_p2_plugin extends cb_p2_core
 			'input_id' => 'cb_p2_style_editor_button_hover_color',
 			'value' => $this->opt['styles'][$set]['button_hover_color'],
 			'css_target_element' => '.cb_p2_social_share_link:hover',
-			'css_rule' => 'background-color',
+			'css_rule' => '',
 			'css_suffix' => '',
 			'size' => 1,
 			'maxlength' => 2		
