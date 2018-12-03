@@ -359,6 +359,18 @@ jQuery(document).ready(function($) {
 			
 			var cb_p2_slider_value_target = document.getElementById(jQuery(this).attr('slider_value_target'));
 			jQuery(cb_p2_slider_value_target).val(ui.value);
+			
+
+			// Exception for button width via padding left and right
+			
+			if(jQuery(cb_p2_slider_value_target).attr('id') == 'cb_p2_style_editor_button_extra_padding') {
+			
+				jQuery(jQuery(cb_p2_slider_value_target).attr('css_target_element')).css('padding-right',jQuery(cb_p2_slider_value_target).val()+jQuery(cb_p2_slider_value_target).attr('css_suffix'));
+				jQuery(jQuery(cb_p2_slider_value_target).attr('css_target_element')).css('padding-left',jQuery(cb_p2_slider_value_target).val()+jQuery(cb_p2_slider_value_target).attr('css_suffix'));
+				
+				return;
+			}			
+				
 			jQuery(jQuery(cb_p2_slider_value_target).attr('css_target_element')).css(jQuery(cb_p2_slider_value_target).attr('css_rule'),jQuery(cb_p2_slider_value_target).val()+jQuery(cb_p2_slider_value_target).attr('css_suffix'));
 			
 		}
@@ -367,18 +379,26 @@ jQuery(document).ready(function($) {
 	
 	jQuery(document).on('input', '.cb_p2_slider_input_value', function(e) {
 		
+		jQuery(document.getElementById(jQuery(this).attr('parent_slider'))).slider( "value", jQuery(this).val());
+		
+		// Exception for button width via padding left and right
+		
+		if(jQuery(this).attr('id') == 'cb_p2_style_editor_button_extra_padding') {
+		
+			jQuery(jQuery(this).attr('css_target_element')).css('padding-right',jQuery(this).val()+jQuery(this).attr('css_suffix'));
+			jQuery(jQuery(this).attr('css_target_element')).css('padding-left',jQuery(this).val()+jQuery(this).attr('css_suffix'));
+			
+			return;
+		}
 		
 		jQuery(jQuery(this).attr('css_target_element')).css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
  
-		jQuery(document.getElementById(jQuery(this).attr('parent_slider'))).slider( "value", jQuery(this).val());
+		
 	
 		
 	});
 	
 	jQuery(document).on('change', '.cb_p2_select_input', function(e) {
-		console.log(jQuery(this).attr('css_target_element'));
-		console.log(jQuery(this).attr('css_rule'));
-		console.log(jQuery(this).val());
 		jQuery(jQuery(this).attr('css_target_element')).css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
 	});
 	

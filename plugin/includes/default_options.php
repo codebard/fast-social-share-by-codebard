@@ -10,6 +10,7 @@ $this->opt = array_replace_recursive(
 			'template'=> 'default',
 			'setup_done'=> false,
 			'license'=> '',
+			'lang' => 'en-US',
 			
 			#MARKER
 			
@@ -27,6 +28,7 @@ $this->opt = array_replace_recursive(
 			'styles' => array(
 				'set_1' => array(
 					'icon_set' => 'set_1',
+					'button_text_display' => 'inline',
 					'button_background_color'=>'#f5f5f5',
 					'button_hover_color'=>'transparent',
 					'button_link_color'=>'#444',
@@ -40,13 +42,15 @@ $this->opt = array_replace_recursive(
 					'button_margin'=>'0.4',
 					'button_text_decoration'=>'none',
 					'button_hover_text_decoration'=>'none',	
-					'button_icon_size'=>'24',		 
+					'button_icon_size'=>'24',	
+					'button_icon_margin'=>'5',	 
 					'follow_button_icon_size'=>'32',
 					'container_wrapper_width'=>'100%',
 					'button_container_margin_top'=>'20px',
 					'button_container_text_align'=>'center',
 					'button_container_padding_left'=>'0px',
-					'button_padding'=>'5em',
+					'button_padding'=>'5',
+					'button_extra_padding '=>'5',
 					'container_background_color'=>'transparent',
 					'container_margin'=>'20',
 					'container_padding'=>'20',
@@ -59,6 +63,7 @@ $this->opt = array_replace_recursive(
 				),
 				'set_2' => array(
 					'icon_set' => 'set_2',
+					'button_text_display' => 'inline',
 					'button_background_color'=>'#f5f5f5',
 					'button_hover_color'=>'transparent',
 					'button_link_color'=>'#444',
@@ -72,13 +77,15 @@ $this->opt = array_replace_recursive(
 					'button_margin'=>'0.4',
 					'button_text_decoration'=>'none',
 					'button_hover_text_decoration'=>'none',			
-					'button_icon_size'=>'24',		 
+					'button_icon_size'=>'24',
+					'button_icon_margin'=>'5',		 
 					'follow_button_icon_size'=>'32',
 					'container_wrapper_width'=>'100%',
 					'button_container_margin_top'=>'20px',
 					'button_container_text_align'=>'center',
 					'button_container_padding_left'=>'0px',
-					'button_padding'=>'5em',
+					'button_padding'=>'5',
+					'button_extra_padding '=>'5',
 					'container_background_color'=>'transparent',
 					'container_margin'=>'20',
 					'container_padding'=>'20',
@@ -91,6 +98,7 @@ $this->opt = array_replace_recursive(
 				),
 				'set_3' => array(
 					'icon_set' => 'set_3',
+					'button_text_display' => 'inline',
 					'button_background_color'=>'#f5f5f5',
 					'button_hover_color'=>'transparent',
 					'button_link_color'=>'#444',
@@ -102,6 +110,7 @@ $this->opt = array_replace_recursive(
 					'button_font_weight'=>'bold',
 					'button_font_size'=>'16',
 					'button_margin'=>'0.4',
+					'button_icon_margin'=>'5',
 					'button_text_decoration'=>'none',
 					'button_hover_text_decoration'=>'none',		
 					'button_icon_size'=>'24',		 
@@ -110,7 +119,8 @@ $this->opt = array_replace_recursive(
 					'button_container_margin_top'=>'20px',
 					'button_container_text_align'=>'center',
 					'button_container_padding_left'=>'0px',
-					'button_padding'=>'5em',
+					'button_padding'=>'5',
+					'button_extra_padding '=>'5',
 					'container_background_color'=>'transparent',
 					'container_margin'=>'20',
 					'container_padding'=>'20',
@@ -123,6 +133,7 @@ $this->opt = array_replace_recursive(
 				),
 				'set_4' => array(
 					'icon_set' => 'set_4',
+					'button_text_display' => 'inline',
 					'button_background_color'=>'#f5f5f5',
 					'button_hover_color'=>'transparent',
 					'button_link_color'=>'#444',
@@ -134,6 +145,7 @@ $this->opt = array_replace_recursive(
 					'button_font_weight'=>'bold',
 					'button_font_size'=>'16',
 					'button_margin'=>'0.4',
+					'button_icon_margin'=>'5',
 					'button_text_decoration'=>'none',
 					'button_hover_text_decoration'=>'none',		
 					'button_icon_size'=>'24',		 
@@ -142,7 +154,8 @@ $this->opt = array_replace_recursive(
 					'button_container_margin_top'=>'20px',
 					'button_container_text_align'=>'center',
 					'button_container_padding_left'=>'0px',
-					'button_padding'=>'5em',
+					'button_padding'=>'5',
+					'button_extra_padding '=>'5',
 					'container_background_color'=>'transparent',
 					'container_margin'=>'20',
 					'container_padding'=>'20',
@@ -151,16 +164,18 @@ $this->opt = array_replace_recursive(
 					'container_border_style'=>'solid',
 					'container_border_radius'=>'0',
 					'container_max_width' => '2000',
-					
+				
 				),
 				'set_5' => array(
-					'icon_set' => 'set_3',
+					'icon_set' => 'set_1',
+					'button_text_display' => 'inline',
 					'button_background_color'=>'#f5f5f5',
 					'button_hover_color'=>'transparent',
 					'button_margin'=>'15',		
 					'button_icon_size'=>'24',
-					'button_icon_margin'=>'0',
+					'button_icon_margin'=>'5',
 					'button_padding'=>'15',
+					'button_extra_padding'=>'15',
 					'button_border_color'=>'#c0c0c0',
 					'button_border_thickness'=>'1',
 					'button_border_style'=>'solid',
@@ -189,6 +204,7 @@ $this->opt = array_replace_recursive(
 				),
 				'set_6' => array(
 					'icon_set' => 'set_6',
+					'button_text_display' => 'inline-block',
 					'button_background_color'=>'#f5f5f5',
 					'button_hover_color'=>'transparent',
 					'button_link_color'=>'#444',
@@ -202,13 +218,15 @@ $this->opt = array_replace_recursive(
 					'button_margin'=>'0.4',
 					'button_text_decoration'=>'none',
 					'button_hover_text_decoration'=>'none',		
-					'button_icon_size'=>'24',		 
+					'button_icon_size'=>'24',
+					'button_icon_margin'=>'5',		 
 					'follow_button_icon_size'=>'32',
 					'container_wrapper_width'=>'100%',
 					'button_container_margin_top'=>'20px',
 					'button_container_text_align'=>'center',
 					'button_container_padding_left'=>'0px',
-					'button_padding'=>'5em',
+					'button_padding'=>'5',
+					'button_extra_padding '=>'5',
 					'container_background_color'=>'transparent',
 					'container_margin'=>'20',
 					'container_padding'=>'20',
@@ -316,9 +334,7 @@ $this->opt = array_replace_recursive(
 			),			
 			
 		)
-		
-		
-
+	
 );
 
 

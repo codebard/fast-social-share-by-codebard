@@ -992,7 +992,6 @@ PRIMARY KEY  (".$key."_id)
 	}
 	public function load_options_c()
 	{
-			
 		if($this->internal['requested_action']=='reset_options')
 		{
 			$this->reset_options();
@@ -1001,7 +1000,7 @@ PRIMARY KEY  (".$key."_id)
 		}
 		
 		$saved_options = get_option($this->internal['prefix'].'options');
-		
+
 		if(!is_array($saved_options) OR count($saved_options)==0)
 		{
 			// No info saved. Save default info:
@@ -1010,6 +1009,7 @@ PRIMARY KEY  (".$key."_id)
 			
 			return $this->opt;		
 		}
+		
 		// If options is saved, then override/merge default options with saved one
 		$options = array_replace_recursive
 		(

@@ -1063,12 +1063,14 @@ class cb_p2_plugin extends cb_p2_core
 	
 	public function get_share_button_content_p( $network, $url, $text_before, $text_after ) {
 		
-		$selected_set = $this->opt['set'];
+		$selected_icon_set = $this->opt['styles'][$this->opt['style_set']]['icon_set'];
+		$selected_set = $this->opt['style_set'];
 		
 		if ( isset( $_REQUEST['cb_p2_set'] ) AND current_user_can('manage_options')  ) {
 			$selected_set = $_REQUEST['cb_p2_set'];		
+			$selected_icon_set = $this->opt['styles'][$selected_set]['icon_set'];
 		}
-		
+
 		$sizes = array(
 			'16',
 			'20',
@@ -1081,10 +1083,10 @@ class cb_p2_plugin extends cb_p2_core
 			'64',		
 		);
 		
-		$closest_icon_size = $this->get_closest($this->opt['style']['button_icon_size'],$sizes);
+		$closest_icon_size = $this->get_closest($this->opt['styles'][$selected_set]['button_icon_size'],$sizes);
 		
 		
-		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'"><img src="'.$this->internal['plugin_url'].'plugin/images/'.$selected_set.'/'.$network.'/'.$closest_icon_size.'.png" id="cb_p2_icon_'.$network.'" style="width:'.$this->opt['style']['button_icon_size'].'px; height:'.$this->opt['style']['button_icon_size'].'px;" /><div class="cb_p2_social_share_link_text">'.$text_after.'</div></a>';		
+		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'"><img src="'.$this->internal['plugin_url'].'plugin/images/'.$selected_icon_set.'/'.$network.'/'.$closest_icon_size.'.png" id="cb_p2_icon_'.$network.'" style="width:'.$this->opt['styles'][$selected_set]['button_icon_size'].'px; height:'.$this->opt['styles'][$selected_set]['button_icon_size'].'px;" /><div class="cb_p2_social_share_link_text">'.$text_after.'</div></a>';		
 	}
 	public function get_closest($search, $arr) {
 		// Gets closest value from an array to a given value
@@ -1257,6 +1259,8 @@ class cb_p2_plugin extends cb_p2_core
 				color: '.$this->opt['styles'][$set]['button_link_color'].';
 				font-weight: '.$this->opt['styles'][$set]['button_font_weight'].';
 				padding: '.$this->opt['styles'][$set]['button_padding'].'px;
+				padding-right: '.$this->opt['styles'][$set]['button_extra_padding'].'px;
+				padding-left: '.$this->opt['styles'][$set]['button_extra_padding'].'px;
 				background-color: '.$this->opt['styles'][$set]['button_background_color'].';
 				border-width: '.$this->opt['styles'][$set]['button_border_thickness'].'px;
 				border-radius: '.$this->opt['styles'][$set]['button_border_radius'].'px;
@@ -1268,7 +1272,6 @@ class cb_p2_plugin extends cb_p2_core
 			  }
 			  
 			  .cb_p2_social_share_link_text{
-				
 				  display:inline-block;
 				  vertical-align:middle;  
 			  }
@@ -1276,8 +1279,7 @@ class cb_p2_plugin extends cb_p2_core
 			  .cb_p2_social_share_link img {
 				  display:inline-block;
 				  vertical-align:middle;
-				  margin-right:'.ceil($this->opt['styles'][$set]['button_font_size']/2).'px;
-				  padding: '.$this->opt['styles'][$set]['button_icon_margin'].'px;
+				  margin: '.$this->opt['styles'][$set]['button_icon_margin'].'px;
 			  }
 			  
 			.cb_p2_social_share_follow_link {
@@ -1287,7 +1289,7 @@ class cb_p2_plugin extends cb_p2_core
 				font-weight: '.$this->opt['styles'][$set]['button_font_weight'].';
 				padding: '.$this->opt['styles'][$set]['button_padding'].'px;
 				background-color: '.$this->opt['styles'][$set]['button_background_color'].';
-				border: '.$this->opt['style']['button_border_thickness'].'px '.$this->opt['styles'][$set]['button_border_style'].' '.$this->opt['styles'][$set]['button_border_color'].';
+				border: '.$this->opt['styles'][$set]['button_border_thickness'].'px '.$this->opt['styles'][$set]['button_border_style'].' '.$this->opt['styles'][$set]['button_border_color'].';
 				display: inline-block;
 				background-size: '.$this->opt['styles'][$set]['follow_button_icon_size'].'px '.$this->opt['styles'][$set]['follow_button_icon_size'].'px;
 				background-repeat: no-repeat;
@@ -1595,9 +1597,9 @@ class cb_p2_plugin extends cb_p2_core
 		$args = array(
 			'title' => 'Icon spacing',
 			'desc' => 'Controls the border thickness of the buttons',
-			'name' => 'button_margin',
-			'input_id' => 'cb_p2_style_editor_icon_margin',
-			'slider_id' => 'cb_p2_value_slider_icon_margin',
+			'name' => 'button_icon_margin',
+			'input_id' => 'cb_p2_style_editor_button_icon_margin',
+			'slider_id' => 'cb_p2_value_slider_button_icon_margin',
 			'min' => 0,
 			'max' => 50,
 			'step' => 1,
@@ -1616,6 +1618,28 @@ class cb_p2_plugin extends cb_p2_core
 			
 		
 		echo '<div class="cb_p2_style_editor_item">';
+		
+
+		$selections = array(
+			'inline'  => 'Show',
+			'none'  => 'Hide',
+		
+		);
+
+		$args = array(
+			'title' => 'Show button text',
+			'desc' => 'Change the color of the button borders',
+			'name' => 'button_text_display',
+			'input_id' => 'cb_p2_style_editor_button_text_display',
+			'selections' => $selections,
+			'value' => $this->opt['styles'][$set]['button_text_display'],
+			'css_target_element' => '.cb_p2_social_share_link_text',
+			'css_rule' => 'display',
+			'css_suffix' => '',	
+		
+		);
+		
+		echo $this->make_style_editor_select_element($args);			
 		
 		$args = array(
 			'title' => 'Button text size',
@@ -1875,6 +1899,26 @@ class cb_p2_plugin extends cb_p2_core
 			'value' => $this->opt['styles'][$set]['button_margin'],
 			'css_target_element' => '.cb_p2_social_share_item',
 			'css_rule' => 'margin',
+			'css_suffix' => 'px',
+			'size' => 2,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+
+		$args = array(
+			'title' => 'Extra button width',
+			'desc' => 'Controls the border thickness of the buttons',
+			'name' => 'button_extra_padding',
+			'input_id' => 'cb_p2_style_editor_button_extra_padding',
+			'slider_id' => 'cb_p2_value_slider_button_margin',
+			'min' => 0,
+			'max' => 300,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['button_extra_padding'],
+			'css_target_element' => '.cb_p2_social_share_link',
+			'css_rule' => '',
 			'css_suffix' => 'px',
 			'size' => 2,
 			'maxlength' => 2		
