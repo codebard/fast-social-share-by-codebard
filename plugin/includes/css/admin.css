@@ -498,6 +498,65 @@ font-weight:bold;
 	display:inline;
 }
 
+.cb_p2_admin_button_general > * {
+    vertical-align: middle;
+}
+.cb_p2_admin_button_general a:link,
+.cb_p2_admin_button_general a:hover,
+.cb_p2_admin_button_general a:visited,
+.cb_p2_admin_button_general a:active
+{
+	text-decoration:none;
+}
+
+
+
+.cb_p2_admin_button_general img {
+	margin-right :5px;
+}
+
+.cb_p2_admin_button_general {
+	background-color:#0085ba;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	border-bottom : 1px solid #006799;
+	border-left : 1px solid #006799;
+	border-right : 1px solid #006799;
+	border-top : 1px solid #0073aa;
+	display:inline-block;
+	margin : 3px;
+	cursor:pointer;
+	color:#ffffff;
+	padding:5px 24px;
+	text-decoration:none;
+	-moz-box-shadow:    0px 1px 0px 0px #006799;
+	-webkit-box-shadow: 0px 1px 0px 0px #006799;
+	box-shadow : 0px 1px 0px 0px #006799;
+}
+.cb_p2_admin_button_general:hover {
+	
+	background:#008ec2;
+	border-color:#006799;
+	color:#fff;
+}
+.cb_p2_admin_button_general:active {
+	position:relative;
+	top:1px;
+}
+
+.cb_p2_general_wizard_button > * {
+    vertical-align: middle;
+}
+.cb_p2_general_wizard_button a:link,
+.cb_p2_general_wizard_button a:hover,
+.cb_p2_general_wizard_button a:visited,
+.cb_p2_general_wizard_button a:active
+{
+	text-decoration:none;
+}
+
+
 .cb_p2_social_network_edit_button > * {
     vertical-align: middle;
 }
@@ -513,46 +572,81 @@ font-weight:bold;
 
 .cb_p2_social_network_edit_button img {
 	margin-right :5px;
+	border : 1px solid #ffffff !important;
 }
 
 .cb_p2_social_network_edit_button {
-	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
-	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
-	box-shadow:inset 0px 1px 0px 0px #ffffff;
-	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffffff), color-stop(1, #f6f6f6));
-	background:-moz-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
-	background:-webkit-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
-	background:-o-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
-	background:-ms-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
-	background:linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0);
-	background-color:#ffffff;
-	-moz-border-radius:6px;
-	-webkit-border-radius:6px;
-	border-radius:6px;
-	border:1px solid #dcdcdc;
+	background-color:#0085ba;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	border-bottom : 1px solid #006799;
+	border-left : 1px solid #006799;
+	border-right : 1px solid #006799;
+	border-top : 1px solid #0073aa;
 	display:inline-block;
 	margin : 3px;
 	cursor:pointer;
-	color:#666666;
-	font-family:Arial;
-	font-size:15px;
-	font-weight:bold;
-	padding:6px 24px;
+	color:#ffffff;
+	padding:5px 24px;
 	text-decoration:none;
-	text-shadow:0px 1px 0px #ffffff;
+	-moz-box-shadow:    0px 1px 0px 0px #006799;
+	-webkit-box-shadow: 0px 1px 0px 0px #006799;
+	box-shadow : 0px 1px 0px 0px #006799;
 }
 .cb_p2_social_network_edit_button:hover {
-	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #f6f6f6), color-stop(1, #ffffff));
-	background:-moz-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
-	background:-webkit-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
-	background:-o-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
-	background:-ms-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
-	background:linear-gradient(to bottom, #f6f6f6 5%, #ffffff 100%);
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f6f6f6', endColorstr='#ffffff',GradientType=0);
-	background-color:#f6f6f6;
+	
+	background:#008ec2;
+	border-color:#006799;
+	color:#fff;
 }
 .cb_p2_social_network_edit_button:active {
+	position:relative;
+	top:1px;
+}
+
+.cb_p2_general_wizard_button > * {
+    vertical-align: middle;
+}
+.cb_p2_general_wizard_button a:link,
+.cb_p2_general_wizard_button a:hover,
+.cb_p2_general_wizard_button a:visited,
+.cb_p2_general_wizard_button a:active
+{
+	text-decoration:none;
+}
+
+
+.cb_p2_general_wizard_button img {
+	margin-right :5px;
+}
+
+.cb_p2_general_wizard_button {
+	background-color:#0085ba;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	border-bottom : 1px solid #006799;
+	border-left : 1px solid #006799;
+	border-right : 1px solid #006799;
+	border-top : 1px solid #0073aa;
+	display:inline-block;
+	margin : 3px;
+	cursor:pointer;
+	color:#ffffff;
+	padding:5px 24px;
+	text-decoration:none;
+	-moz-box-shadow:    0px 1px 0px 0px #006799;
+	-webkit-box-shadow: 0px 1px 0px 0px #006799;
+	box-shadow : 0px 1px 0px 0px #006799;
+}
+.cb_p2_general_wizard_button:hover {
+
+	background:#008ec2;
+	border-color:#006799;
+	color:#fff;
+}
+.cb_p2_general_wizard_button:active {
 	position:relative;
 	top:1px;
 }
@@ -560,7 +654,8 @@ font-weight:bold;
 
 .cb_p2_processing_message {
 	display:block;
-	font-size :24px;	
+	font-size :24px;
+	margin:10px;
 }
 
 .cb_p2_social_network_edit_wrapper{
@@ -584,7 +679,21 @@ font-weight:bold;
 	
 	display:block;
 	margin:20px;
+	max-width:800px;
+	width:100%;
 	
+}
+
+#cb_p2_style_preview_form{
+	
+	display:inline-block;
+	margin-left:10px; 
+}
+#cb_p2_style_preview_form_heading{
+	
+	display:inline-block;
+	font-size:20px;
+	font-weight:bold;
 }
 #cb_p2_set_editor{
 	
@@ -662,20 +771,53 @@ font-weight:bold;
 		vertical-align:top;
 		clear: both;
 	
-	
 }
 
 #cb_p2_style_editor_buttons_wrapper{
 	
 	display:block;
 	clear:both;
-	position: -webkit-sticky; /* Safari */
-    position: sticky;
-    top: 0;
-	padding:20px;
-	margin:10px;
+	margin-top:0px;
 	background-color: #f1f1f1;
-	z-index:1000;
-	border: 1px solid #c0c0c0;
+}
+
+#cb_p2_customize_style_info, #cb_p2_style_editor_items {
+	
+	display:none;
+	
+}
+
+#cb_p2_current_style_info {
+		display:block;
+	font-size :24px;
+	margin:10px;
+	margin-top:20px;
+}
+
+#cb_p2_style_assignment_div {
+		display:block;
+	font-size :16px;
+	margin:10px;
+	margin-left: 0px;
+}
+
+
+.cb_p2_plugin_title{
+	
+	margin-top:5px;
+	margin-bottom:5px;
+	font-weight:bold;
+	font-size:20px;
+}
+.cb_p2_plugin_insert{
+	width:200px;
+	font-weight:bold;
+	background-color: #ffffff;
+	margin:5px;
+	padding:8px;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+	float:left;
 	
 }

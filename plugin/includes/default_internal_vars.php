@@ -58,12 +58,11 @@ $this->internal = array_replace_recursive(
 				
 				
 			),
-			'languages'=>array(
+			'general'=>array(
 				
 				
 			),
-			'addons'=>array(
-				
+			'languages'=>array(
 				
 				
 			),

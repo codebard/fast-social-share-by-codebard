@@ -25,6 +25,11 @@ $this->opt = array_replace_recursive(
 				'set_6',
 			),
 			
+			'post_types' => array(
+				'post' => 'default',
+				'page' => 'none',
+			),
+			
 			'styles' => array(
 				'set_1' => array(
 					'icon_set' => 'set_1',

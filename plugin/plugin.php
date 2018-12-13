@@ -3,8 +3,7 @@
 
 class cb_p2_plugin extends cb_p2_core
 {
-	public function plugin_construct()
-	{
+	public function plugin_construct() {
 		
 		// If Patreon_WordPress class is not found, drop a notice and exit.
 
@@ -37,7 +36,6 @@ class cb_p2_plugin extends cb_p2_core
 		}
 		
 	}
-	
 	public function add_admin_menus_p() {
 	
 		add_menu_page( $this->lang['admin_menu_label'], $this->lang['admin_menu_label'], 'administrator', 'settings_'.$this->internal['id'], array(&$this,'do_settings_pages'), $this->internal['plugin_url'].'images/admin_menu_icon.png', 86 );
@@ -45,7 +43,6 @@ class cb_p2_plugin extends cb_p2_core
 		add_submenu_page ( '', $this->lang['admin_menu_label'], $this->lang['admin_menu_label'], 'administrator', 'setup_wizard_'.$this->internal['id'], array(&$this,'do_setup_wizard'), $this->internal['plugin_url'].'images/admin_menu_icon.png', 86 );		
 		
 	}
-	
 	public function admin_init_p() {
 
 		$this->check_redirect_to_setup_wizard();
@@ -60,22 +57,31 @@ class cb_p2_plugin extends cb_p2_core
 		
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'update_social_network', array( &$this, 'social_network_add_update' ),10,1 );
 
+		add_action( 'wp_ajax_'.$this->internal['prefix'].'save_style', array( &$this, 'save_style' ),10,1 );
+
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'make_social_network_list', array( &$this, 'make_social_network_list' ),10,1 );
+		
+		add_action( 'wp_ajax_'.$this->internal['prefix'].'refresh_post_to_style_assignments_div', array( &$this, 'refresh_post_to_style_assignments_div' ),10,1 );
 		
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'delete_social_network', array( &$this, 'delete_social_network' ),10,1 );
 		
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'load_set_to_edit', array( &$this, 'load_set_to_edit' ),10,1 );
 		
+		add_action( 'wp_ajax_'.$this->internal['prefix'].'activate_style', array( &$this, 'activate_style' ),10,1 );
+		
+		add_action( 'wp_ajax_'.$this->internal['prefix'].'assign_style_to_post_type', array( &$this, 'assign_style_to_post_type' ),10,1 );
+		
 		// Add css to head in admin if the page is related to the design wizard
 		
-		if ( isset( $_REQUEST['cb_p2_tab'] ) AND $_REQUEST['cb_p2_tab'] == 'customize_design' ) {
+		if ( ( isset( $_REQUEST['cb_p2_tab'] ) AND $_REQUEST['cb_p2_tab'] == 'customize_design' ) OR
+			 ( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'setup_wizard_cb_p2' )
+			)
+		{
 			add_action('admin_head', array(&$this, 'add_css_to_head'));
-			
 		}
 				
 	}
-	public function init_p()
-	{
+	public function init_p() {
 		
 		if( $this->required_plugins() OR !$this->opt['setup_done'] ) {
 			return;
@@ -83,8 +89,7 @@ class cb_p2_plugin extends cb_p2_core
 		
 		
 	}
-	public function load_options_p()
-	{
+	public function load_options_p() {
 		// Initialize and modify plugin related variables
 		
 		return $this->internal['core_return'];
@@ -93,8 +98,7 @@ class cb_p2_plugin extends cb_p2_core
 	
 	// Plugin specific functions start
 
-	public function setup_languages_p()
-	{
+	public function setup_languages_p() {
 		// Here we do plugin specific language procedures. 
 		
 		// Set up the custom post type and its taxonomy slug into options:
@@ -121,8 +125,7 @@ class cb_p2_plugin extends cb_p2_core
 			$this->update_opt();
 		}
 	}
-	public function check_redirect_to_setup_wizard_p()
-	{
+	public function check_redirect_to_setup_wizard_p() {
 	
 		if(is_admin() AND current_user_can('manage_options')) {
 		
@@ -140,20 +143,20 @@ class cb_p2_plugin extends cb_p2_core
 		}
 		
 	}	
-	public function enqueue_frontend_styles_p()
-	{
+	public function enqueue_frontend_styles_p() {
 		wp_enqueue_style( $this->internal['id'].'-css-main', $this->internal['template_url'].'/'.$this->opt['template'].'/style.css' );
 	}
-	public function enqueue_admin_styles_p()
-	{
+	public function enqueue_admin_styles_p() {
 		$current_screen=get_current_screen();
 
 		if(is_admin())
 		{
 			wp_enqueue_style( $this->internal['id'].'-css-admin', $this->internal['plugin_url'].'plugin/includes/css/admin.css' );
 			
-			if ( isset( $_REQUEST['cb_p2_tab'] ) AND $_REQUEST['cb_p2_tab'] == 'customize_design' ) {
-				
+			if ( ( isset( $_REQUEST['cb_p2_tab'] ) )  OR
+			 ( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'setup_wizard_cb_p2' )
+			 )
+			 {	
 				$wp_scripts = wp_scripts();
 				wp_enqueue_style(
 				  'jquery-ui-theme-smoothness',
@@ -167,27 +170,27 @@ class cb_p2_plugin extends cb_p2_core
 			
 		}		
 	}
-	public function enqueue_frontend_scripts_p()
-	{
+	public function enqueue_frontend_scripts_p() {
 	
 	}	
-	public function enqueue_admin_scripts_p()
-	{
+	public function enqueue_admin_scripts_p() {
 		// This will enqueue the Media Uploader script
 		
 
-		if ( isset( $_REQUEST['cb_p2_tab'] ) AND $_REQUEST['cb_p2_tab'] == 'customize_design' ) {
-				
+		if ( ( isset( $_REQUEST['cb_p2_tab'] ))  OR
+			 ( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'setup_wizard_cb_p2' )
+			 )
+			 {	
 			wp_enqueue_media();
-			wp_enqueue_script('jquery');
-			wp_enqueue_script('jquery-ui-core');
-			wp_enqueue_script('jquery-ui-slider');
-			wp_enqueue_script( 'wp-color-picker');
+			wp_enqueue_script( 'jquery' );
+			wp_enqueue_script( 'jquery-ui-core' );
+			wp_enqueue_script( 'jquery-ui-slider' );
+			wp_enqueue_script( 'jquery-ui-dialog' );
+			wp_enqueue_script( 'wp-color-picker' );
 			wp_enqueue_script( $this->internal['id'].'-js-admin', $this->internal['plugin_url'].'plugin/includes/scripts/admin.js' );
 		}	
 	}
-	public function upgrade_p($v1,$v2=false)
-	{
+	public function upgrade_p($v1,$v2=false) {
 		$upgrader_object = $v1;
 		$options = $v2;
 
@@ -227,8 +230,7 @@ class cb_p2_plugin extends cb_p2_core
 			}
 		}
 	}
-	public function do_setup_wizard_p()
-	{
+	public function do_setup_wizard_p() {
 		// Here we do and process setup wizard if it is not done:
 		
 		
@@ -262,8 +264,7 @@ class cb_p2_plugin extends cb_p2_core
 		}
 
 	}
-	public function process_credentials_at_setup_p($v1)
-	{
+	public function process_credentials_at_setup_p($v1) {
 		global $cb_p6;
 		$request=$v1;
 
@@ -387,8 +388,7 @@ class cb_p2_plugin extends cb_p2_core
 		
 		 
 	}
-	public function api_credentials_fail_during_setup_p($v1)
-	{
+	public function api_credentials_fail_during_setup_p($v1) {
 		global $cb_p6;
 
 		// This happened during setup, and credentials failed. Drop a notifier.
@@ -405,8 +405,7 @@ class cb_p2_plugin extends cb_p2_core
 		require($this->internal['plugin_path'].'plugin/includes/api_credentials_setup_failed.php');
 		
 	}
-	public function required_plugins_p($v1)
-	{
+	public function required_plugins_p($v1) {
 		if(!function_exists('wp_get_current_user')) {
 			include(ABSPATH . "wp-includes/pluggable.php"); 
 		}
@@ -654,10 +653,7 @@ class cb_p2_plugin extends cb_p2_core
 		exit();
 		
 	}
-	
-	
-	public function make_date_select_p($v1=false)
-	{
+	public function make_date_select_p($v1=false) {
 		$args = $v1;
 		
 		if(isset($args['start_year']))
@@ -954,8 +950,6 @@ class cb_p2_plugin extends cb_p2_core
 			<?php		
 		}
 	}
-	
-	
 	public function frontend_init_p() {
 		
 		add_filter( 'the_content', array(&$this, 'add_post_buttons'), 10 , 1 );
@@ -1060,7 +1054,6 @@ class cb_p2_plugin extends cb_p2_core
 		
 		
 	}
-	
 	public function get_share_button_content_p( $network, $url, $text_before, $text_after ) {
 		
 		$selected_icon_set = $this->opt['styles'][$this->opt['style_set']]['icon_set'];
@@ -1086,7 +1079,15 @@ class cb_p2_plugin extends cb_p2_core
 		$closest_icon_size = $this->get_closest($this->opt['styles'][$selected_set]['button_icon_size'],$sizes);
 		
 		
-		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'"><img src="'.$this->internal['plugin_url'].'plugin/images/'.$selected_icon_set.'/'.$network.'/'.$closest_icon_size.'.png" id="cb_p2_icon_'.$network.'" style="width:'.$this->opt['styles'][$selected_set]['button_icon_size'].'px; height:'.$this->opt['styles'][$selected_set]['button_icon_size'].'px;" /><div class="cb_p2_social_share_link_text">'.$text_after.'</div></a>';		
+		
+		$button_icon = $this->internal['plugin_url'].'plugin/images/'.$selected_icon_set.'/'.$network.'/'.$closest_icon_size.'.png" id="cb_p2_icon_'.$network;
+		
+		if ( $this->opt['social_networks'][$network]['icon'] != 'default' )  {
+			$button_icon = $this->opt['social_networks'][$network]['icon'];
+		}
+		
+		
+		return '<a class="'.$this->internal['prefix'].'social_share_link '.$this->internal['prefix'].'social_share_button_'.$network.'" href="'.$url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'"><img src="'.$button_icon.'" style="width:'.$this->opt['styles'][$selected_set]['button_icon_size'].'px; height:'.$this->opt['styles'][$selected_set]['button_icon_size'].'px;" /><div class="cb_p2_social_share_link_text" style="display: '.$this->opt['styles'][$selected_set]['button_text_display'].';">'.$text_after.'</div></a>';		
 	}
 	public function get_closest($search, $arr) {
 		// Gets closest value from an array to a given value
@@ -1109,14 +1110,14 @@ class cb_p2_plugin extends cb_p2_core
 		if ( isset( $_REQUEST['cb_p2_set'] ) AND current_user_can('manage_options') ) {
 			$selected_set = $_REQUEST['cb_p2_set'];		
 		}
-		
+
 		foreach ( $this->opt['styles'] as $key => $value ) {
 			
 			$set_name = $key;
 			
 			$selected = '';
 			
-			if( isset( $this->lang[$key] ) ) {
+			if( isset( $this->lang['style_'.$key] ) ) {
 				
 				$set_name = $this->lang['style_'.$key];
 				
@@ -1125,20 +1126,61 @@ class cb_p2_plugin extends cb_p2_core
 			if ( $key == $selected_set ) {
 				$selected = 'selected';
 			}
-			
-			
+		
 			$sets .= '<option value="'.$key.'" '.$selected.'>'.$set_name.'</option>';			
 			
 		}
 		
-		return '<div id="cb_p2_design_editor"><form action="" method="post"><select id="cb_p2_set_selector" name="cb_p2_set">'.$sets.'</select><input class="cb_p2_social_network_edit_button" type="submit" value="Preview" style="font-size:18px;"></form></div>';		
+		return '<div id="cb_p2_design_editor"><div id="cb_p2_style_preview_form_heading">Preview a style</div> <form action="" method="post" id="cb_p2_style_preview_form"><select id="cb_p2_set_selector" name="cb_p2_set">'.$sets.'</select></form><div class="cb_p2_admin_button_general" id="cb_p2_select_style_button" target="cb_p2_selector_messages" target_url="">Activate</div><div class="cb_p2_admin_button_general" id="cb_p2_customize_style_button" target="cb_p2_set_editor">Customize</div></div>';		
 	}
+	
+	public function make_design_selector_for_setup_wizard_p() {
+		
+		// Why?
+		// Because we want to offer different options for the wizard. Those options may differentiate more in future. Hence this separate function
+		
+		$sets = '';
+		
+		$selected_set = $this->opt['style_set'];
+		
+		if ( isset( $_REQUEST['cb_p2_set'] ) AND current_user_can('manage_options') ) {
+			$selected_set = $_REQUEST['cb_p2_set'];		
+		}
+
+		foreach ( $this->opt['styles'] as $key => $value ) {
+			
+			$set_name = $key;
+			
+			$selected = '';
+			
+			if( isset( $this->lang['style_'.$key] ) ) {
+				
+				$set_name = $this->lang['style_'.$key];
+				
+			}
+			
+			if ( $key == $selected_set ) {
+				$selected = 'selected';
+			}
+		
+			$sets .= '<option value="'.$key.'" '.$selected.'>'.$set_name.'</option>';			
+			
+		}
+		
+		return '<div id="cb_p2_design_editor"><div id="cb_p2_style_preview_form_heading">Previewing:</div> <form action="" method="post" id="cb_p2_style_preview_form"><select id="cb_p2_set_selector" name="cb_p2_set">'.$sets.'</select></form><form name="cb_p2_move_to_setup_2" enctype="multipart/form-data" id="cb_p2_move_to_setup_2_id" method="post" action="'.$this->internal['admin_url'].'admin.php?page=setup_wizard_'.$this->internal['id'].'&'.$this->internal['prefix'].'setup_stage=1'.'"><input type="hidden" name="cb_p2_selected_style_at_setup" id="cb_p2_selected_style_at_setup" value="" /><div class="cb_p2_admin_button_general" id="cb_p2_customize_style_button" target="cb_p2_set_editor">Customize</div><div class="cb_p2_admin_button_general" id="cb_p2_select_style_and_move_to_next_step_button" target="cb_p2_set_editor">Select & Move to next step</div></form>
 
 	
+	</div>';		
+	}
 	public function add_post_buttons_p( $content ) {
 		
 		// Return if it is not a post from an accepted post type		
-		if( (in_array('get_the_excerpt', $GLOBALS['wp_current_filter']) OR !in_array( get_post_type(), $this->opt['accepted_post_types'] ) AND $_REQUEST['cb_p2_tab'] != 'customize_design' ) ) {
+		if( 
+			(in_array('get_the_excerpt', $GLOBALS['wp_current_filter']) OR !in_array( get_post_type(), $this->opt['accepted_post_types'] )) AND
+			$_REQUEST['cb_p2_tab'] != 'customize_design' AND	
+			!( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'setup_wizard_cb_p2' )
+				
+		) {
 			return $content;
 		}
 		
@@ -1153,66 +1195,15 @@ class cb_p2_plugin extends cb_p2_core
 		$share_interface = $this->make_share_interface( $post_id );
 		
 		return $content.$share_interface;
-		
-		foreach( $this->opt['social_networks'] as $key => $value )
-		{
-			$processed_url='';
-			$current=$this->opt['social_networks'][$key];
-			
-			if(!$current['active'])
-			{
-				continue;
-			}
-			 
-			$shares .= '<div class="cb_p2_social_share_item">';	
-			$follows .= '<div class="cb_p2_social_share_item">';	
-		
-			
-			$processed_url=str_replace('{CONTENTTITLE}',$share_title,$current['url']);
-			$processed_url=str_replace('{CONTENTURL}',$share_url,$processed_url);
-			
-			if($key=='twitter')
-			{
-				$processed_url=str_replace('{FOLLOWACCOUNT}',$this->opt['social_networks'][$key]['follow'],$processed_url);
-		
-			
-			}
-			if($key=='pinterest')
-			{
-					
-				$processed_url=str_replace('{CONTENTIMAGE}',wp_get_attachment_url(get_post_thumbnail_id()),$processed_url);
 				
-			}			
-			$shares .= '<a class="cb_p2_social_share_link cb_p2_social_share_button_'.$key.'" href="'.$processed_url.'" rel="nofollow" target="'.$this->opt['functionality']['share_link_target'].'">'.$current['text'].'</a>';
-			
-			if($current['follow']!='')
-			{
-				if($key=='twitter')
-				{
-					$current['follow']='https://twitter.com/'.$current['follow'];
-			
-				}			
-				$follows .= '<a class="cb_p2_social_share_link cb_p2_social_share_button_'.$key.'" href="'.$current['follow'].'" rel="nofollow" target="'.$this->opt['functionality']['follow_link_target'].'">&nbsp;</a>';	
-			}
-			$shares .= '</div>';				
-			$follows .= '</div>';				
-			
-	
-		
-		}
-		$shares.='</div></div>';
-		$follows.='</div></div>';
-		
-		return $content.$shares.$follows;
-			
 
 
 	}
-
 	public function add_css_to_head_p() {
 		
 
 		$set = $this->opt['style_set'];
+		
 		if ( current_user_can('manage_options') AND isset( $_REQUEST['cb_p2_set'] ) ) {
 			$set = $_REQUEST['cb_p2_set'];
 		}
@@ -1224,16 +1215,16 @@ class cb_p2_plugin extends cb_p2_core
 			.cb_p2_share_container {
 				display: inline-table;
 				width : '.$this->opt['styles'][$set]['container_wrapper_width'].';
-				clear:both;
-				margin-top:'.$this->opt['styles'][$set]['button_container_margin_top'].';
+				clear: both;
 			}
 
-		
 			.cb_p2_social_share {
 				display: inline-block;
 				max-width : '.$this->opt['styles'][$set]['container_max_width'].'px;
 				width: 100%;
-				padding-left: '.$this->opt['styles'][$set]['button_container_padding_left'].';
+				margin-top: '.$this->opt['styles'][$set]['container_margin'].'px;
+				margin-bottom: '.$this->opt['styles'][$set]['container_margin'].'px;
+				padding: '.$this->opt['styles'][$set]['container_padding'].'px;
 				list-style: none; 
 				text-align : '.$this->opt['styles'][$set]['button_container_text_align'].';
 				background-color: '.$this->opt['styles'][$set]['container_background_color'].';
@@ -1285,8 +1276,6 @@ class cb_p2_plugin extends cb_p2_core
 			.cb_p2_social_share_follow_link {
 			
 				text-decoration: '.$this->opt['styles'][$set]['button_text_decoration'].';
-				color: '.$this->opt['styles'][$set]['button_link_color'].';
-				font-weight: '.$this->opt['styles'][$set]['button_font_weight'].';
 				padding: '.$this->opt['styles'][$set]['button_padding'].'px;
 				background-color: '.$this->opt['styles'][$set]['button_background_color'].';
 				border: '.$this->opt['styles'][$set]['button_border_thickness'].'px '.$this->opt['styles'][$set]['button_border_style'].' '.$this->opt['styles'][$set]['button_border_color'].';
@@ -1298,6 +1287,11 @@ class cb_p2_plugin extends cb_p2_core
 			  
 			  }			  
 			  
+			.cb_p2_social_share_link:link, .cb_p2_social_share_link:visited, .cb_p2_social_share_link:active 
+			{
+				color: '.$this->opt['styles'][$set]['button_link_color'].';
+				font-weight: '.$this->opt['styles'][$set]['button_font_weight'].';
+			}
 			.cb_p2_social_share_link:hover
 			{
 				background-color: '.$this->opt['styles'][$set]['button_hover_color'].';
@@ -1313,8 +1307,6 @@ class cb_p2_plugin extends cb_p2_core
 						
 			echo '</style>';
 	}
-		
-	
 	public function load_set_to_edit_p() {
 	
 		// Loads an icon set to edit its styles.
@@ -1325,6 +1317,29 @@ class cb_p2_plugin extends cb_p2_core
 		
 		$requested_set = $_REQUEST['cb_p2_selected_set'];
 		
+		
+		wp_die();
+		
+	
+	}
+	public function activate_style_p() {
+	
+		// Sets a style as the active one
+		
+		if ( !current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		
+		$message = '<div class="cb_p2_processing_message">Sorry - could not activate the style...</div>';
+		
+		if ( isset( $_REQUEST['cb_p2_selected_style'] ) AND array_key_exists( $_REQUEST['cb_p2_selected_style'],$this->opt['styles']) ) {
+			
+			$this->opt['style_set'] = $_REQUEST['cb_p2_selected_style'];
+			$this->update_opt();
+			$message = '<div class="cb_p2_processing_message">Activated! Please make sure to refresh your site\'s cache! This page will refresh in 5 seconds.</div>';
+		}
+		
+		echo $message;
 		
 		wp_die();
 		
@@ -1350,7 +1365,7 @@ class cb_p2_plugin extends cb_p2_core
 		
 		// If no key, abort
 
-
+		
 		if ( $social_network['existing_network_id'] == 'add_new' AND $social_network['id'] == '' ) {
 			echo '<div class="cb_p2_processing_message">Sorry - network id is required...</div>';
 			wp_die();
@@ -1377,6 +1392,112 @@ class cb_p2_plugin extends cb_p2_core
 		$this->update_opt();
 		
 		echo '<div class="cb_p2_processing_message">Network updated!</div>';
+		wp_die();
+	
+	}
+	public function assign_style_to_post_type_p() {
+	
+		// Adds/updates social network
+		
+		if ( !current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$unparsed_data = $_POST['data'];
+		parse_str($unparsed_data,$parsed_form);
+		
+		if ( !isset( $parsed_form['selected_post_type']) OR !isset( $parsed_form['selected_style']) ) {
+			echo '<div class="cb_p2_processing_message">Sorry - either post type or style is missing...</div>';
+			wp_die();
+		}
+
+		$this->opt['post_types'][$parsed_form['selected_post_type']] = $parsed_form['selected_style'];
+		
+		$this->update_opt();
+		
+		echo '<div class="cb_p2_processing_message">Assigned post type to style</div>';
+		wp_die();
+	
+	}
+	public function save_style_p() {
+	
+		// Adds/updates social network
+		
+		if ( !current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$unparsed_data = $_POST['data'];
+		parse_str($unparsed_data,$parsed_style);
+		
+	
+		foreach ( $parsed_style as $key => $value ) {
+			// Snip prefix
+			$new_key = str_replace('cb_p2_','',$key);
+			$style[$new_key]=$parsed_style[$key];
+		}
+		
+		
+		$style_id = $style['style_id'];
+		
+		if ( $style_id == '' ) {
+			echo '<div class="cb_p2_processing_message">Sorry - couldn\t determine which style you are saving...</div>';
+			wp_die();
+		}
+
+		unset($style['style_id']);
+		
+		$message = 'Style updated!';
+
+		// A more elegant solution can be arranged for the creation of new style ids later
+		if ( $_REQUEST['cb_p2_save_type'] == 'new_style' ) {
+			
+			$max_custom = 7;
+			
+			foreach ( $this->opt['styles'] as $key => $value ) {
+				
+				if ( substr($key, 0 , 4 ) == 'set_' ) {
+					// Custom style check max id
+					$custom_id_count = str_replace( 'set_', '', $key );
+					
+					if( $custom_id_count > $max_custom ) {
+						$max_custom = $custom_id_count;
+					}
+				
+				}
+			
+			}
+			
+			$max_custom++;
+			$style_id = 'set_'.$max_custom;
+			$message = 'New style saved!';
+			
+			$this->lang['style_'.$style_id] = $_REQUEST['cb_p2_style_name'];
+
+			update_option( $this->internal['prefix'].'lang_'.$this->opt['lang'], $this->lang );
+		}
+			
+		
+		$this->opt['styles'][$style_id] = $style;
+		
+		// A more elegant solution can be arranged for the creation of new style ids later
+		if ( $_REQUEST['cb_p2_save_type'] == 'delete_style' ) {
+						
+			// Unset the style.
+			
+			unset($this->opt['styles'][$style_id]);
+			
+			unset($this->lang['style_'.$style_id]);
+			
+			
+			update_option( $this->internal['prefix'].'lang_'.$this->opt['lang'], $this->lang );
+			
+			$message = 'Style deleted...';
+		}			
+		
+		$this->update_opt();
+		
+		echo '<div class="cb_p2_processing_message">'.$message.'</div>';
 		wp_die();
 	
 	}
@@ -1516,7 +1637,7 @@ class cb_p2_plugin extends cb_p2_core
 			$set = $_REQUEST['cb_p2_set'];
 		}
 		
-		echo '<div id="cb_p2_style_editor_items">';
+		echo '<div id="cb_p2_style_editor_messages"></div><div id="cb_p2_style_editor_items"><form action="" id="cb_p2_style_editor_form" method="post">';
 		
 		// Icon properties
 		
@@ -2127,8 +2248,8 @@ class cb_p2_plugin extends cb_p2_core
 		echo $this->make_style_editor_slider_element($args);		
 		
 		echo '</div>';
-		
-		echo '</div>';
+		echo '<input type="hidden" name="style_id" value="'.$set.'" />';
+		echo '</div></form>';
 		
 	}
 	public function make_style_editor_select_element_p($args) {
@@ -2183,9 +2304,42 @@ class cb_p2_plugin extends cb_p2_core
 		
 		
 		$element .= '<div class="cb_p2_style_editor_item_label" for="'.$args['input_id'].'">'.$args['title'].'</div>
-			<input class="cb_p2_color_picker" id="'.$args['input_id'].'" type="text" name="header_color" value="'.$args['value'].'"  css_target_element="'.$args['css_target_element'].'" css_rule="'.$args['css_rule'].'" css_suffix="'.$args['css_suffix'].'" />';
+			<input class="cb_p2_color_picker" id="'.$args['input_id'].'" type="text" name="'.$args['name'].'" value="'.$args['value'].'"  css_target_element="'.$args['css_target_element'].'" css_rule="'.$args['css_rule'].'" css_suffix="'.$args['css_suffix'].'" />';
 		
 		return $element;
+	}
+	public function refresh_post_to_style_assignments_div_p() {
+		
+		// Makes social network selection list for admin
+		
+		if ( !current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+
+		$post_types = get_post_types();
+		$select='';
+		$current_post_types='';
+		$shown = 'default';
+		foreach($post_types as $key => $value)
+		{
+			$obj=get_post_type_object($key);
+			$select.='<option value="'.$key.'">'.$obj->labels->singular_name.'</option>';
+			
+			if ( !isset( $this->opt['post_types'][$key] ) ) {
+				continue;
+			}
+			
+			$obj=get_post_type_object($key);
+			$current_post_types .= $obj->labels->name.':<br>'.$this->lang['style_'.$this->opt['post_types'][$key]];
+			$current_post_types .= '<br><br>';
+		}
+		
+		echo 'Current post types to styles - for any post type that is not listed, default applies<br><br><b>'.substr($current_post_types,0,-2).'</b>';
+	
+		if (defined('DOING_AJAX') && DOING_AJAX) {
+			wp_die();
+		}
 	}
 	public function make_social_network_list_p() {
 		
@@ -2222,7 +2376,6 @@ class cb_p2_plugin extends cb_p2_core
 		}
 	}
 }
-
 
 $cb_p2 = cb_p2_plugin::get_instance();
 

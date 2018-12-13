@@ -23,6 +23,7 @@ $lang = array(
 	'admin_tab_social_networks' => 'Social Networks',
 	'admin_tab_customize_design' => 'Customize Design',
 	'admin_tab_sidebar_widgets' => 'Sidebar Widgets',
+	'admin_tab_general' => 'General',
 	'admin_tab_addons' => 'Addons',
 	'admin_tab_support' => 'Support',
 	'admin_tab_general' => 'General',
@@ -103,12 +104,15 @@ $lang = array(
 	'social_networks_sort' => 'Sort order of the social network. Smaller numbers will show up before bigger numbers',
 	'social_networks_select_network' => 'Select Social Network to edit',
 	
-	'style_set_1' => 'Style Set 1',
-	'style_set_2' => 'Style Set 2',
-	'style_set_3' => 'Style Set 3',
-	'style_set_4' => 'Style Set 4',
-	'style_set_5' => 'Style Set 5',
-	'style_set_6' => 'Style Set 6',
+	'style_set_1' => 'Super One',
+	'style_set_2' => 'Diagnotico',
+	'style_set_3' => 'Avatar S',
+	'style_set_4' => 'Pink',
+	'style_set_5' => 'Nori-Nori San',
+	'style_set_6' => 'Elemental',
+	'style_set_default' => 'Selected default style',
+	'style_default' => 'Selected default style',
+	'style_none' => 'No social share shown',
 	
 	'set_1' => 'Icon set 1',
 	'set_2' => 'Icon set 2',
@@ -116,6 +120,26 @@ $lang = array(
 	'set_4' => 'Icon set 4',
 	'set_5' => 'Icon set 5',
 	'set_6' => 'Icon set 6',
+	
+	 
+	'extras_join_affiliates_title' => 'Work with us',
+	'extras_join_affiliates_explanation' => 'Partner with us in our affiliate program and receive 70% of initial sale and up to 20% recurring commissions for promoting our software',
+	'admin_page_affiliate_link_label' => 'Click here for details',
+	'admin_rapier_title' => 'Rapier WordPress Theme',
+	'view_all_tickets_label' => 'All Tickets',
+	'previous_page_url_label' => 'Click here',
+	'newsletter_link' => 'https://zortzort.us9.list-manage.com/subscribe?u=5afbc1be9f2ed76070f4b64fd&id=25287e5ddb',
+	'tell_your_friends' => 'Tell your friends!',
+	'tweet_the_plugin' => 'http://twitter.com/intent/tweet?url=https%3A%2F%2Fwordpress.org%2Fplugins%2Ffast-social-share-by-codebard&text=Fast%20Custom%20Social%20Share%20is%20a%20great%20way%20to%20add%20social%20buttons%20to%20your%20WordPress%20site!%20&via=codebardcom&hashtags=wordpress,social,share',
+
+	'admin_rapier_info' => 'A very fast, HTML5, Responsive theme from CodeBard. Rapier has page load speeds as low as 1.5 seconds, which is very good for SEO and user experience.',
+	'admin_rapier_link_text' => 'More info, demo and download here',
+	
+	
+	'news_and_info_title' => 'News & Info',
+	'news_and_info_title_explanation' => 'Receive news, notifications, info regarding this and other CodeBard Plugins & Themes:',
+	'join_mailing_list_link' => 'Join CodeBard News List here',
+	'admin_page_support_link' => 'our help desk by clicking here',
 
 );
 

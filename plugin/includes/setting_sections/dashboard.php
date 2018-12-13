@@ -2,9 +2,6 @@
 	
 			<button class="cb_p2_admin_button" onclick="window.open('https://codebard.com/patreon-button-and-plugin-manual');" target="_blank"><?php echo $this->lang['setup_read_manual'];?></button>
 	
-			
-		<?php 	echo $pro_manual; 	?>
-
 	</div>
 	<div class="cb_p2_setup_wizard_two_col" style="max-width : 600px;">
 	

@@ -14,6 +14,66 @@ jQuery(document).ready(function($) {
 		jQuery(cb_p2_input_target).toggle('slow');
 		
 	});
+	
+	
+	jQuery(document).on('change', '#cb_p2_set_selector', function(e) {
+		
+		var cb_p2_input_target = jQuery('#cb_p2_selector_messages');
+		jQuery(cb_p2_input_target).empty();
+		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Refreshing preview...</div>');	
+		
+		jQuery('#cb_p2_style_preview_form').submit();
+	});
+	
+	
+	jQuery(document).on( 'click', "#cb_p2_select_style_and_move_to_next_step_button", function (e) {
+		
+		e.preventDefault();
+		var cb_p2_selected_style = jQuery('#cb_p2_set_selector').val();
+		
+		jQuery('#cb_p2_selected_style_at_setup').val(cb_p2_selected_style);
+		
+		jQuery('#cb_p2_move_to_setup_2_id').submit();
+		
+	});	
+	
+	jQuery(document).on( 'click', "#cb_p2_select_style_button", function (e) {
+		
+		e.preventDefault();
+		var cb_p2_selected_style = jQuery('#cb_p2_set_selector').val();
+		var cb_p2_input_target = document.getElementById(jQuery(this).attr('target'));
+		jQuery(cb_p2_input_target).empty();
+		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Processing...</div>');	
+		
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'cb_p2_activate_style',
+				cb_p2_selected_style: cb_p2_selected_style,
+			},
+			success: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+				setTimeout(function(){
+					location.reload();
+				},5000);
+			},
+			error: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+			},
+			statusCode: {
+				500: function(error) {
+					jQuery(cb_p2_input_target).empty();
+					jQuery(cb_p2_input_target).html(error);
+				}
+			}
+		});		
+		
+		
+	});	
 	jQuery(document).on( 'click', ".cb_p2_social_network_edit", function (e) {
 		e.preventDefault();
 		var cb_p2_input_target = document.getElementById(jQuery(this).attr('target'));
@@ -47,38 +107,26 @@ jQuery(document).ready(function($) {
 		});
 		
 	});
-	jQuery(document).on( 'click', "#cb_p2_customize_set_button", function (e) {
+	jQuery(document).on( 'click', "#cb_p2_customize_style_button", function (e) {
 		e.preventDefault();
-		var cb_p2_input_target = document.getElementById(jQuery(this).attr('target'));
-		var cb_p2_selected_set = jQuery('#cb_p2_set_selector').val();
-		jQuery(cb_p2_input_target).empty();
-		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Processing...</div>');	
-
-		jQuery.ajax({
-			url: ajaxurl,
-			type:"POST",
-			dataType : 'html',
-			data: {
-				action: 'cb_p2_load_set_to_edit',
-				cb_p2_selected_set: cb_p2_selected_set,
-			},
-			success: function( response ) {
-				jQuery(cb_p2_input_target).empty();
-				jQuery(cb_p2_input_target).html(response);
-			},
-			error: function( response ) {
-				jQuery(cb_p2_input_target).empty();
-				jQuery(cb_p2_input_target).html(response);
-			},
-			statusCode: {
-				500: function(error) {
-					jQuery(cb_p2_input_target).empty();
-					jQuery(cb_p2_input_target).html(error);
-				}
-			}
-		});
 		
+        var target = document.getElementById('cb_p2_customize_style_info');
+		var current_state = jQuery(target).css('display');
+		
+		jQuery('#cb_p2_customize_style_info').slideToggle('slow');
+		jQuery('#cb_p2_style_editor_items').slideToggle('slow');
+
+        if (target) {
+			if ( current_state == 'block' ) {
+				return;
+			}
+            jQuery('html, body').animate({
+                scrollTop: (jQuery(target).offset().top - 50)
+            }, 1000);
+        }
 	});
+	
+		
 	jQuery(document).on( 'click', "#cb_p2_delete_network_button", function (e) {
 		e.preventDefault();
 		var cb_p2_input_target = document.getElementById(jQuery(this).attr('ajax_target_div'));
@@ -170,7 +218,61 @@ jQuery(document).ready(function($) {
 		jQuery(this).prev().val('');
 	
 	});
+
+	jQuery(document).on( 'submit', '#cb_p2_assign_style_to_post_type_form', function(e) {
+		
+		
+        e.preventDefault();
 	
+		var cb_p2_input_target = document.getElementById(jQuery(this).attr('ajax_target_div'));
+		
+		jQuery('#cb_p2_social_network_edit_form').remove();
+
+		jQuery(cb_p2_input_target).empty();
+		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Processing...</div>');	
+
+		var cb_p2_general_error = '<div class="cb_p2_processing_message">Sorry - could not update the social network...</div>';		
+		
+		var data = jQuery(this).serialize();
+		var social_network = jQuery(this).find('input[name^="cb_p2_existing_network_id"]').val();
+		
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'cb_p2_assign_style_to_post_type',
+				data: data,
+			},
+			success: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				if( response == '' ) {
+					//White page - possibly an issue with the server/site caused an error during updates
+					response = cb_p2_general_error;
+				}
+				
+				jQuery(cb_p2_input_target).html(response);
+				cb_p2_refresh_post_to_style_assignments_div();
+			},
+			error: function( response ) {
+				if( response == '' ) {
+					//White page - possibly an issue with the server/site caused an error during updates
+					response = cb_p2_general_error;
+				}
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+			},
+			statusCode: {
+				500: function(error) {
+					response = cb_p2_general_error;
+					jQuery(cb_p2_input_target).empty();
+					jQuery(cb_p2_input_target).html(response);
+				}
+			}
+		});
+		
+	});
+		
 
 	jQuery(document).on( 'submit', '#cb_p2_social_network_edit_form', function(e) {
 		
@@ -226,6 +328,38 @@ jQuery(document).ready(function($) {
 		
 	});
 	
+	function cb_p2_refresh_post_to_style_assignments_div(){
+		
+		cb_p2_input_target = jQuery('#cb_p2_style_assignment_div');
+		
+		jQuery(cb_p2_input_target).empty();
+		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Refreshing assignments...</div>');	
+
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'cb_p2_refresh_post_to_style_assignments_div',
+			},
+			success: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).hide().html(response).fadeIn();
+			},
+			error: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+			},
+			statusCode: {
+				500: function(error) {
+					jQuery(cb_p2_input_target).empty();
+					jQuery(cb_p2_input_target).html(error);
+				}
+			}
+		});		
+		
+		
+	}
 	function cb_p2_refresh_social_network_div(){
 		
 		cb_p2_input_target = jQuery('#cb_p2_social_network_list_insert');
@@ -258,6 +392,190 @@ jQuery(document).ready(function($) {
 		
 		
 	}
+
+	 jQuery('#cb_p2_new_style_dialog').dialog({
+           autoOpen: false, //FALSE if you open the dialog with, for example, a button click
+           title: 'Saving as new style',
+           modal: true
+		});
+
+	jQuery(document).on( 'click', '#cb_p2_customize_style_save_button2', function(e) {
+		
+        e.preventDefault();
+		
+		jQuery('#cb_p2_new_style_dialog').dialog('open');
+        return false;
+		
+	});
+	
+	jQuery(document).on( 'click', '#cb_p2_new_style_dialog_form_submit', function(e) {
+	
+	
+        e.preventDefault();
+		
+		jQuery('#cb_p2_new_style_dialog').dialog('close');
+		
+		var style_name = jQuery('#cb_p2_new_style_name').val();
+		
+		var cb_p2_input_target = jQuery('#cb_p2_style_editor_messages');
+		
+		jQuery(cb_p2_input_target).empty();
+		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Processing...</div>');	
+
+		var cb_p2_general_error = '<div class="cb_p2_processing_message">Sorry - could not update the social network...</div>';
+
+		var data = jQuery('#cb_p2_style_editor_form').serialize();
+		jQuery('#cb_p2_style_editor_items').toggle();
+		
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'cb_p2_save_style',
+				cb_p2_save_type: 'new_style',
+				cb_p2_style_name: style_name,
+				data: data,
+			},
+			success: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				if( response == '' ) {
+					//White page - possibly an issue with the server/site caused an error during updates
+					response = cb_p2_general_error;
+				}
+				
+				jQuery(cb_p2_input_target).html(response);
+				jQuery('#cb_p2_style_editor_items').toggle();
+			},
+			error: function( response ) {
+				if( response == '' ) {
+					//White page - possibly an issue with the server/site caused an error during updates
+					response = cb_p2_general_error;
+				}
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+				jQuery('#cb_p2_style_editor_items').toggle();
+			},
+			statusCode: {
+				500: function(error) {
+					response = cb_p2_general_error;
+					jQuery(cb_p2_input_target).empty();
+					jQuery(cb_p2_input_target).html(response);
+					jQuery('#cb_p2_style_editor_items').toggle();
+				}
+			}
+		});
+		
+	});
+	
+	
+	jQuery(document).on( 'click', '#cb_p2_customize_style_save_button3', function(e) {
+		
+        e.preventDefault();
+	
+		var cb_p2_input_target = jQuery('#cb_p2_style_editor_messages');
+		
+		jQuery(cb_p2_input_target).empty();
+		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Processing...</div>');	
+
+		var cb_p2_general_error = '<div class="cb_p2_processing_message">Sorry - could not update the social network...</div>';
+		
+		var data = jQuery('#cb_p2_style_editor_form').serialize();
+		jQuery('#cb_p2_style_editor_items').toggle();
+		
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'cb_p2_save_style',
+				cb_p2_save_type: 'delete_style',
+				data: data,
+			},
+			success: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				if( response == '' ) {
+					//White page - possibly an issue with the server/site caused an error during updates
+					response = cb_p2_general_error;
+				}
+				
+				jQuery(cb_p2_input_target).html(response);
+				jQuery('#cb_p2_style_editor_items').toggle();
+			},
+			error: function( response ) {
+				if( response == '' ) {
+					//White page - possibly an issue with the server/site caused an error during updates
+					response = cb_p2_general_error;
+				}
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+				jQuery('#cb_p2_style_editor_items').toggle();
+			},
+			statusCode: {
+				500: function(error) {
+					response = cb_p2_general_error;
+					jQuery(cb_p2_input_target).empty();
+					jQuery(cb_p2_input_target).html(response);
+					jQuery('#cb_p2_style_editor_items').toggle();
+				}
+			}
+		});
+		
+	});
+	
+	jQuery(document).on( 'click', '#cb_p2_customize_style_save_button1', function(e) {
+		
+        e.preventDefault();
+	
+		var cb_p2_input_target = jQuery('#cb_p2_style_editor_messages');
+		
+		jQuery(cb_p2_input_target).empty();
+		jQuery(cb_p2_input_target).html('<div class="cb_p2_processing_message">Processing...</div>');	
+
+		var cb_p2_general_error = '<div class="cb_p2_processing_message">Sorry - could not update the social network...</div>';
+		
+		var data = jQuery('#cb_p2_style_editor_form').serialize();
+		jQuery('#cb_p2_style_editor_items').toggle();
+		
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'cb_p2_save_style',
+				cb_p2_save_type: 'same_style',
+				data: data,
+			},
+			success: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				if( response == '' ) {
+					//White page - possibly an issue with the server/site caused an error during updates
+					response = cb_p2_general_error;
+				}
+				
+				jQuery(cb_p2_input_target).html(response);
+				jQuery('#cb_p2_style_editor_items').toggle();
+			},
+			error: function( response ) {
+				if( response == '' ) {
+					//White page - possibly an issue with the server/site caused an error during updates
+					response = cb_p2_general_error;
+				}
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+				jQuery('#cb_p2_style_editor_items').toggle();
+			},
+			statusCode: {
+				500: function(error) {
+					response = cb_p2_general_error;
+					jQuery(cb_p2_input_target).empty();
+					jQuery(cb_p2_input_target).html(response);
+					jQuery('#cb_p2_style_editor_items').toggle();
+				}
+			}
+		});
+		
+	});
 	
 	jQuery(document).on( 'submit', '#cb_p2_ajax_plugin_install_form', function(e) {
 		
@@ -433,8 +751,8 @@ jQuery(document).ready(function($) {
 		var extra_info = JSON.parse(window.atob(jQuery(this).attr('extra_info')));
 		var set = jQuery('#cb_p2_icon_set_selector').val();
 		var button_size = jQuery('#cb_p2_button_icon_size_selector').val();
-		console.log(set);
-		console.log(button_size);
+		
+		
 		for (var key in extra_info['social_networks']) {
 			
 			var button = jQuery(document.getElementById('cb_p2_icon_'+key));
