@@ -49,25 +49,7 @@
 		if( $this->opt['content_buttons_placement'] == 'top_and_bottom' ) {
 			$placement_top_and_bottom = ' selected';
 		}
-		$counter=1;
-		foreach( $this->opt['styles'] as $key => $value ) {
-			echo '<br>'.$counter.'<br>';
-			$counter++;
-			echo '<br>==========='.$key.'===========<br>';
-			
-			echo '<br>==========='.$this->lang['style_'.$key].'===========<br>';
-			foreach ( $this->opt['styles'][$key] as $style_key => $style_value ) {
-					
-					
-				echo "'".$style_key."' => '".$this->opt['styles'][$key][$style_key]."',";
-				echo '<br>';
-				
-			}
-			
-			echo '<br>=================<br>';
-			
-		}
-		
+
 		
 ?>
 
