@@ -3,7 +3,12 @@
 if ( isset($_REQUEST['cb_p2_selected_style_at_setup'] ) AND array_key_exists($_REQUEST['cb_p2_selected_style_at_setup'],$this->opt['styles'] ) ) {
 
 	$this->opt['style_set'] = $_REQUEST['cb_p2_selected_style_at_setup'];
+	$this->internal['setup_is_being_done'] = false;
+	$this->opt['setup_is_being_done'] = false;
+	$this->opt['setup_done'] = true;
 	$this->update_opt();
+	$this->update_opt();
+	
 }
 
 ?>
