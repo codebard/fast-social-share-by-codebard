@@ -16,6 +16,46 @@ jQuery(document).ready(function($) {
 	});
 	
 	
+	jQuery(document).on('change', '.cb_p2_select_option', function(e) {
+		
+		var cb_p2_input_target = document.getElementById(jQuery(this).attr('id')+'_messages');
+		var cb_p2_option = jQuery(this).attr('name');
+		var cb_p2_option_value = jQuery(this).val();
+		
+		
+		jQuery(cb_p2_input_target).empty();
+		jQuery(cb_p2_input_target).html('Processing...');	
+		
+		jQuery.ajax({
+			url: ajaxurl,
+			type:"POST",
+			dataType : 'html',
+			data: {
+				action: 'cb_p2_change_option_from_ajax',
+				cb_p2_option: cb_p2_option,
+				cb_p2_option_value: cb_p2_option_value,
+			},
+			success: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+				setTimeout(function(){
+					location.reload();
+				},5000);
+			},
+			error: function( response ) {
+				jQuery(cb_p2_input_target).empty();
+				jQuery(cb_p2_input_target).html(response);
+			},
+			statusCode: {
+				500: function(error) {
+					jQuery(cb_p2_input_target).empty();
+					jQuery(cb_p2_input_target).html(error);
+				}
+			}
+		});
+		
+	});
+	
 	jQuery(document).on('change', '#cb_p2_set_selector', function(e) {
 		
 		var cb_p2_input_target = jQuery('#cb_p2_selector_messages');
@@ -70,7 +110,7 @@ jQuery(document).ready(function($) {
 					jQuery(cb_p2_input_target).html(error);
 				}
 			}
-		});		
+		});
 		
 		
 	});	
@@ -163,17 +203,6 @@ jQuery(document).ready(function($) {
 		
 	});
 	
-	jQuery("#cb_p2_post_locking_format_toggle").change(function (e) {
-		var cb_p2_locking_format = jQuery(this).val();
-        e.preventDefault();
-		jQuery('.cb_p2_locking_format_selector').hide();
-		jQuery('#cb_p2_post_locking_value').hide();
-		if(cb_p2_locking_format!='none') {
-			jQuery("#cb_p2_post_locking_format_" + cb_p2_locking_format).toggle('slow');
-			jQuery('#cb_p2_post_locking_value').toggle('slow');
-				
-		}
-	});
 	
 	jQuery(document).on( 'click', '.cb_p2_notice .notice-dismiss', function(e) {
 
@@ -719,27 +748,63 @@ jQuery(document).ready(function($) {
 	jQuery(document).on('change', '.cb_p2_select_input', function(e) {
 		jQuery(jQuery(this).attr('css_target_element')).css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
 	});
-	
 
 	jQuery('.cb_p2_color_picker').each(function(){
+		
+		var current_element = jQuery(this);
+		
 		jQuery(this).wpColorPicker({
 			hide: true,
+			clear: function(event, ui) {
+				
+				// Set value to transparent if it was erased:
+				
+				var color_picker_element = jQuery(this).parent().find( ".cb_p2_color_picker" )
+				var set_value = 'transparent';
+		
+				
+				if(color_picker_element.attr('id') == 'cb_p2_style_editor_button_hover_color') {
+					// If we dont 'important' these rules, they get overridden if the non-hover rules are changed in style editor
+					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover {background-color:'+set_value+' !important;} </style>');
+					return;
+				}
+				if(color_picker_element.attr('id') == 'cb_p2_style_editor_button_link_hover_color') {
+					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover .cb_p2_social_share_link_text {color:'+set_value+' !important;}</style>');
+					return;
+				}
+				
+				color_picker_element.val('transparent');
+				
+				jQuery(color_picker_element.attr('css_target_element')).css(color_picker_element.attr('css_rule'),set_value+color_picker_element.attr('css_suffix'));
+				
+				
+			},
 			change: function(event, ui){
+				
+				
+				// Set value to transparent if it was erased:
+				
+				var set_value = jQuery(this).val();
+				
+				if ( set_value == '' ) {
+					set_value = 'transparent';
+				}
+				
 				
 				// Exception for hover color change
 		
 				if(jQuery(this).attr('id') == 'cb_p2_style_editor_button_hover_color') {
 					// If we dont 'important' these rules, they get overridden if the non-hover rules are changed in style editor
-					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover {background-color:'+jQuery(this).val()+' !important;} </style>');
+					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover {background-color:'+set_value+' !important;} </style>');
 					return;
 				}
 				if(jQuery(this).attr('id') == 'cb_p2_style_editor_button_link_hover_color') {
-					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover .cb_p2_social_share_link_text {color:'+jQuery(this).val()+' !important;}</style>');
+					jQuery('head').append('<style type="text/css">.cb_p2_social_share_link:hover, .cb_p2_social_share_link:hover .cb_p2_social_share_link_text {color:'+set_value+' !important;}</style>');
 					return;
 				}
 				
 				
-				jQuery(jQuery(this).attr('css_target_element')).css(jQuery(this).attr('css_rule'),jQuery(this).val()+jQuery(this).attr('css_suffix'));
+				jQuery(jQuery(this).attr('css_target_element')).css(jQuery(this).attr('css_rule'),set_value+jQuery(this).attr('css_suffix'));
 				
 			}
 			
@@ -755,12 +820,12 @@ jQuery(document).ready(function($) {
 		
 		for (var key in extra_info['social_networks']) {
 			
-			var button = jQuery(document.getElementById('cb_p2_icon_'+key));
-			
-			jQuery(button).attr('src',extra_info['plugin_url']+'plugin/images/'+set+'/'+key+'/'+button_size+'.png');
-			
-			jQuery(button).css('width',button_size);
-			jQuery(button).css('height',button_size);
+			jQuery('.cb_p2_icon_'+key).each(function() {
+				
+				jQuery(this).attr('src', extra_info['plugin_url']+'plugin/images/'+set+'/'+key+'/'+button_size+'.png');
+				jQuery(this).css('width',button_size);
+				jQuery(this).css('height',button_size);
+			});			
 		
 		}		
 	
@@ -770,19 +835,16 @@ jQuery(document).ready(function($) {
 		
 		var extra_info = JSON.parse(window.atob(jQuery(this).attr('extra_info')));
 		var set = jQuery(this).val();
-		
-		// cb_p2_social_share_button_
-		
+		var button_size = jQuery(document.getElementById('cb_p2_button_icon_size_selector')).val();
+			
 		for (var key in extra_info['social_networks']) {
-			
-			var button = jQuery(document.getElementById('cb_p2_icon_'+key));
-			var button_size = jQuery(document.getElementById('cb_p2_button_icon_size_selector')).val();
-			
-			jQuery(button).attr('src',extra_info['plugin_url']+'plugin/images/'+set+'/'+key+'/'+button_size+'.png');
-			
-			
-			jQuery(button).css('width',button_size);
-			jQuery(button).css('height',button_size);
+	
+			jQuery('.cb_p2_icon_'+key).each(function() {
+				
+				jQuery(this).attr('src', extra_info['plugin_url']+'plugin/images/'+set+'/'+key+'/'+button_size+'.png');
+				jQuery(this).css('width',button_size);
+				jQuery(this).css('height',button_size);
+			});
 		
 		}
 		

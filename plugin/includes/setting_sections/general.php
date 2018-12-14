@@ -37,8 +37,50 @@
 			
 		}
 		
+		if( $this->opt['content_buttons_placement'] == 'top' ) {
+			$placement_top = ' selected';
+		}
+		
+		
+		if( $this->opt['content_buttons_placement'] == 'bottom' ) {
+			$placement_bottom = ' selected';
+		}
+		
+		if( $this->opt['content_buttons_placement'] == 'top_and_bottom' ) {
+			$placement_top_and_bottom = ' selected';
+		}
+		$counter=1;
+		foreach( $this->opt['styles'] as $key => $value ) {
+			echo '<br>'.$counter.'<br>';
+			$counter++;
+			echo '<br>==========='.$key.'===========<br>';
+			
+			echo '<br>==========='.$this->lang['style_'.$key].'===========<br>';
+			foreach ( $this->opt['styles'][$key] as $style_key => $style_value ) {
+					
+					
+				echo "'".$style_key."' => '".$this->opt['styles'][$key][$style_key]."',";
+				echo '<br>';
+				
+			}
+			
+			echo '<br>=================<br>';
+			
+		}
+		
 		
 ?>
+
+
+<h3>Social share placement</h3>
+You can choose to place the social share at the bottom of your content, at the top, or both.
+<div id="content_buttons_placement_messages" class="cb_p2_option_message cb_p2_block"></div>
+
+<select name="content_buttons_placement" class="cb_p2_select_option" id="content_buttons_placement">
+<option value="bottom" <?php echo $placement_bottom ?>>Bottom</option>
+<option value="top_and_bottom" <?php echo $placement_top_and_bottom ?>>Top and Bottom</option>
+<option value="top" <?php echo $placement_top ?>>Top</option>
+</select>
 
 
 <h3>Style to Post type matches</h3>

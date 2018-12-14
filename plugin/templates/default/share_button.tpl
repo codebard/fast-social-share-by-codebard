@@ -1,3 +1,1 @@
-<div class="{***prefix***}social_share_item">
-{***button_content***}
-</div>
+<div class="{***prefix***}social_share_item">{***button_content***}</div>

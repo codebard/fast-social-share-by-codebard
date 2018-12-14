@@ -821,3 +821,12 @@ font-weight:bold;
 	float:left;
 	
 }
+.cb_p2_option_message{
+	display:inline-block;
+	margin:10px;
+	margin-left:0px;
+	font-weight:bold;
+}
+.cb_p2_block{
+	display:block;
+}

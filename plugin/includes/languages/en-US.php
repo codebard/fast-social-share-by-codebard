@@ -104,7 +104,7 @@ $lang = array(
 	'social_networks_sort' => 'Sort order of the social network. Smaller numbers will show up before bigger numbers',
 	'social_networks_select_network' => 'Select Social Network to edit',
 	
-	'style_set_1' => 'Super One',
+	'style_set_1' => 'Tesla',
 	'style_set_2' => 'Diagnotico',
 	'style_set_3' => 'Avatar S',
 	'style_set_4' => 'Pink',
