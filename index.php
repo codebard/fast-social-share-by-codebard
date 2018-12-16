@@ -2,7 +2,7 @@
 /*
 	Plugin Name: Fast Custom Social Share by CodeBard
 	Plugin URI: https://wordpress.org/plugins/fast-social-share-by-codebard/
-	Description: Fast Social Share buttons
+	Description: Very fast, very customizable, very easy social share buttons
 	Version: 1.0.0
 	Author: CodeBard	
 	License: GPLv2

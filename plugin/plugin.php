@@ -1064,10 +1064,27 @@ class cb_p2_plugin extends cb_p2_core
 		$selected_set = $this->opt['style_set'];
 		$selected_icon_set = $this->opt['styles'][$selected_set]['icon_set'];
 		
+		// If a specific style is set for this post type, set it to that
+		
+		$post_type = get_post_type();
+		
+		if ( $post_type AND array_key_exists($post_type,$this->opt['post_types']) )  {
+			$selected_set = $this->opt['post_types'][$post_type];
+			$selected_icon_set = $this->opt['styles'][$selected_set]['icon_set'];
+		}		
+		
 		if ( isset( $_REQUEST['cb_p2_set'] ) AND current_user_can('manage_options')  ) {
 			$selected_set = $_REQUEST['cb_p2_set'];		
 			$selected_icon_set = $this->opt['styles'][$selected_set]['icon_set'];
 		}
+		
+		// Set the set to default set if it is set to value default
+		
+		if ( $selected_set == 'default' ) {
+			$selected_set = $this->opt['style_set'];
+			$selected_icon_set = $this->opt['styles'][$selected_set]['icon_set'];
+		}
+				
 
 		$sizes = array(
 			'16',
@@ -1196,9 +1213,7 @@ class cb_p2_plugin extends cb_p2_core
 		if ( isset ( $post->ID ) ) {
 			$post_id = $post->ID;
 		}
-		
-		
-				
+			
 		$share_interface = $this->make_share_interface( $post_id );
 		
 		// If in install or design wizard, return one set of buttons
@@ -1224,8 +1239,22 @@ class cb_p2_plugin extends cb_p2_core
 
 		$set = $this->opt['style_set'];
 		
+		// If a specific style is set for this post type, set it to that
+		
+		$post_type = get_post_type();
+		
+		if ( $post_type AND array_key_exists($post_type,$this->opt['post_types']) )  {
+			$set = $this->opt['post_types'][$post_type];
+		}
+		
 		if ( current_user_can('manage_options') AND isset( $_REQUEST['cb_p2_set'] ) ) {
 			$set = $_REQUEST['cb_p2_set'];
+		}
+		
+		// Set the set to default set if it is set to value default
+		
+		if ( $set == 'default' ) {
+			$set = $this->opt['style_set'];
 		}
 		
 		// Process some of the settings to make up for some defaults:

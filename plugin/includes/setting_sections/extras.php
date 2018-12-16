@@ -16,11 +16,19 @@
 	}
 	
 ?>
+	<div class="cb_p2_h2">Patron Plugin Pro</div>
+	<div class="cb_p2_admin_info">Easily link your site with Patreon and start a membership site to make montyly revenue.
+	
+	<a href="https://codebard.com/patron-plugin-pro" target="_blank">Read details & Get it Here</a>
+	</div>
+	
+	<hr width="100%">
 	<div class="cb_p2_h2">WooCommerce Support System</div>
 	<div class="cb_p2_admin_info">Easy and Professional support ticket system for WooCommerce.
 	
-	<a href="https://codebard.com/codebard-help-desk-woocommerce-integration" target="_blank">Buy & Download Here</a>
+	<a href="https://codebard.com/codebard-help-desk-woocommerce-integration" target="_blank">Read details & Get it Here</a>
 	</div>
+	
 	<hr width="100%">
 	<div class="cb_p2_h2">CodeBard Help Desk</div>
 	<div class="cb_p2_admin_info">Full featured support ticket system for WordPress. Multi Language, Unlimited Departments, Unlimited Agents.
