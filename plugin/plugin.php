@@ -1199,7 +1199,7 @@ class cb_p2_plugin extends cb_p2_core
 		// Return if it is not a post from an accepted post type		
 		if( 
 			(in_array('get_the_excerpt', $GLOBALS['wp_current_filter']) OR !in_array( get_post_type(), $this->opt['accepted_post_types'] )) AND
-			$_REQUEST['cb_p2_tab'] != 'customize_design' AND	
+			(!isset($_REQUEST['cb_p2_tab']) OR $_REQUEST['cb_p2_tab'] != 'customize_design') AND	
 			!( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'setup_wizard_cb_p2' )
 				
 		) {
