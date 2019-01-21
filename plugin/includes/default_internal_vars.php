@@ -9,7 +9,7 @@ $this->internal = array_replace_recursive(
 		
 		'id' => 'cb_p2',
 		'prefix' => 'cb_p2_',
-		'version' => '1.0.0',
+		'version' => '1.0.1',
 		'plugin_name' => 'Fast Custom Social Share by CodeBard',
 		
 		'callable_from_request' => array(

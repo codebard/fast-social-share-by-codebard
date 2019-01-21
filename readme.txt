@@ -7,7 +7,7 @@ Tags: share, social share, social media, social media share, share buttons
 License: GPL
 Requires at least: 4.0
 Tested up to: 4.9.9
-Stable Tag: 1.0.0
+Stable Tag: 1.0.1
 
 Fast Custom Social Share loads fast, is extensively customizable, and allows you to add social networks yourself.
 
@@ -15,7 +15,7 @@ Fast Custom Social Share loads fast, is extensively customizable, and allows you
 
 Very fast, very customizable and very easy to use social share buttons.
 
-Use customizable, static share buttons that work without any external JavaScript. Thanks to that, it makes your pages loads faster. It also prevents tracking of your users by 3rd parties.
+Use customizable, static share buttons that work without any external JavaScript. Makes your pages loads faster! Prevent tracking of your users by 3rd parties.
 
 Select from 14 different, professionally designed icon sets! Choose the best set that goes with your theme and your content! Change the style of any set to fit your tastes and your site!
 
@@ -58,6 +58,10 @@ To be updated
 3. View of the Social network editor in plugin admin
 
 == Changelog ==
+
+= 1.0.1 =
+
+* Fixed an error that was caused by a page or post type not having a style assigned
 
 = 1.0.0 =
 

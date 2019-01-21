@@ -1257,6 +1257,11 @@ class cb_p2_plugin extends cb_p2_core
 			$set = $this->opt['style_set'];
 		}
 		
+		if ( $set == 'none' ) {
+			// We dont show buttons for this set. Return
+			return;
+		}
+		
 		// Process some of the settings to make up for some defaults:
 		
 		foreach ( $this->opt['styles'][$set] as $key => $value ) {
@@ -1730,7 +1735,7 @@ class cb_p2_plugin extends cb_p2_core
 			'social_network_active' => $social_network_active_selector,
 			'follow' => $this->opt['social_networks'][$network]['follow'],
 			'sort' => $this->opt['social_networks'][$network]['sort'],
-			'existing_network_id' => $existing_network_id,
+			'existing_network_id' => strtolower($existing_network_id),
 		);
 		
 		$social_network_edit_form = $this->process_vars_to_template($vars, $social_network_edit_form);
