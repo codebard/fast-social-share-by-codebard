@@ -1067,9 +1067,14 @@ class cb_p2_plugin extends cb_p2_core
 		// If a specific style is set for this post type, set it to that
 		
 		$post_type = get_post_type();
-		
+
 		if ( $post_type AND array_key_exists($post_type,$this->opt['post_types']) )  {
 			$selected_set = $this->opt['post_types'][$post_type];
+			
+			if ( $selected_set == 'default' ) {
+				$selected_set = 'set_1';
+			}
+			
 			$selected_icon_set = $this->opt['styles'][$selected_set]['icon_set'];
 		}		
 		
