@@ -150,6 +150,7 @@ $lang = array(
 	'news_and_info_title_explanation' => 'Receive news, notifications, info regarding this and other CodeBard Plugins & Themes:',
 	'join_mailing_list_link' => 'Join CodeBard News List here',
 	'admin_page_support_link' => 'our help desk by clicking here',
+	'update_available' => 'A new version of '.$this->internal['plugin_name'].' is available! Please update your plugin to benefit from security fixes, bug fixes and new features. To update your plugin, <a href="{***plugin_update_url***}" target="_self">click here</a>',
 
 );
 

@@ -46,9 +46,7 @@ class cb_p2_plugin extends cb_p2_core
 	public function admin_init_p() {
 
 		$this->check_redirect_to_setup_wizard();
-		
-		add_filter( 'pre_set_site_transient_update_plugins', array(&$this, 'check_for_update' ) );
-		
+				
 		$this->internal['plugin_update_url'] =  wp_nonce_url(get_admin_url().'update.php?action=upgrade-plugin&plugin='.$this->internal['plugin_slug'],'upgrade-plugin_'.$this->internal['plugin_slug']);
 		
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'install_update_plugins', array( &$this, 'install_update_plugins' ),10,1 );
@@ -2500,6 +2498,26 @@ class cb_p2_plugin extends cb_p2_core
 			wp_die();
 		}
 	}
+	public function check_for_update($checked_data) 
+	{
+			global $wp_version, $plugin_version, $plugin_base;
+		
+			if ( empty( $checked_data->checked ) ) {
+				return $checked_data;
+			}
+
+			if(isset($checked_data->response[$this->internal['plugin_id'].'/index.php']) AND version_compare( $this->internal['version'], $checked_data->response[$this->internal['plugin_id'].'/index.php']->new_version, '<' ))
+			{
+
+				// place update link into update lang string :
+		
+				$update_link = $this->process_vars_to_template(array('plugin_update_url'=>$this->internal['plugin_update_url']),$this->lang['update_available']);
+
+				$this->queue_notice($update_link,'info','update_available','perma',true);		
+			}
+			return $checked_data;
+		
+	}	
 }
 
 $cb_p2 = cb_p2_plugin::get_instance();

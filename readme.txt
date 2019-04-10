@@ -6,8 +6,8 @@ Donate link: http://codebard.com/donate
 Tags: share, social share, social media, social media share, share buttons
 License: GPL
 Requires at least: 4.0
-Tested up to: 5.0.3
-Stable Tag: 1.0.2
+Tested up to: 5.1.1
+Stable Tag: 1.0.3
 
 Fast Custom Social Share loads fast, is extensively customizable, and allows you to add social networks yourself.
 
@@ -58,6 +58,10 @@ To be updated
 3. View of the Social network editor in plugin admin
 
 == Changelog ==
+
+= 1.0.3 =
+
+* A major issue which interfered with updating plugins was fixed
 
 = 1.0.2 =
 
