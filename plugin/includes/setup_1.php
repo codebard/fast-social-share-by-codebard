@@ -11,6 +11,7 @@ if ( isset($_REQUEST['cb_p2_selected_style_at_setup'] ) AND array_key_exists($_R
 	
 }
 
+
 ?>
 
 <div class="<?php echo $this->internal['prefix'];?>settings">

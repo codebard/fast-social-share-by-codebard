@@ -7,7 +7,7 @@ Tags: share, social share, social media, social media share, share buttons
 License: GPL
 Requires at least: 4.0
 Tested up to: 5.1.1
-Stable Tag: 1.0.3
+Stable Tag: 1.0.7
 
 Fast Custom Social Share loads fast, is extensively customizable, and allows you to add social networks yourself.
 
@@ -30,10 +30,13 @@ You can even use different style social shares for different post types! Just as
 Full features:
 
 - Beautifully designed buttons
-- Fast - loads no external JavaScript. 
+- Fast - loads no external JavaScript
 - Customizable - select from ~14 premade styles, create and edit your own!
+- Customize how your share will look with visual editor!
 - Add new social networks yourself!
-- Icon sizes from 16px to 64px! Loads the exact icon size for your style and keeps it fast!
+- Icon sizes from 16px to 64px! Loads the exact icon size for your style and keeps it fast
+- Make the share sticky or non sticky!
+- Show at the top, bottom or both at the top and bottom of your posts
 - Upload custom icons easily to use in place of default icons!
 - Optionally add text to social share buttons
 - Optional text for social networks is also customizable - ie you can put 'Tweet' for Twitter and 'Share' for Facebook
@@ -58,6 +61,23 @@ To be updated
 3. View of the Social network editor in plugin admin
 
 == Changelog ==
+
+= 1.0.7 =
+
+* Major issue with showing the selected style for post post type was fixed. It should now work properly.
+* Major issue with styling the main share container was fixed
+* Now you can make shares sticky! They will scroll as your content is scrolled. 
+* Sticky share margin can be adjusted
+* Added option to align the shares to center, left or right
+
+= 1.0.6 =
+
+* Twitter share now adds tags if a post has any tags. This should increase the visibility of shares at twitter.
+* Added title and summary to Linkedin shares, but Linkedin seems to have started to discard those values.
+
+= 1.0.4 =
+
+* Removed Google Plus from default social network list since they closed their service. Icons still remain
 
 = 1.0.3 =
 

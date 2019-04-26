@@ -137,7 +137,7 @@ class cb_p2_plugin extends cb_p2_core
 				$this->opt['redirect_to_setup_wizard'] = false;
 				$this->update_opt();
 				// wp_redirect($this->internal['admin_url'].'admin.php?page=settings_cb_p6&cb_p6_tab=content_locking');
-				wp_redirect($this->internal['admin_url'].'admin.php?page=setup_wizard_'.$this->internal['id'].'&setup_stage=0');
+				wp_redirect($this->internal['admin_url'].'admin.php?page=setup_wizard_'.$this->internal['id'].'&'.$this->internal['prefix'].'setup_stage=0');
 				exit;	
 			}
 		}
@@ -972,9 +972,9 @@ class cb_p2_plugin extends cb_p2_core
 			
 		}
 		
-		
 		$share_url = '';
 		$share_title = '';
+		$tags = '';
 		
 		if ( $post_id ) {
 			
@@ -986,6 +986,8 @@ class cb_p2_plugin extends cb_p2_core
 			$share_url = urlencode($get_url);
 			
 			$share_title = urlencode( $post->post_title );
+			
+			$tags = wp_get_post_tags( $post_id );
 		}
 		
 		$share_interface_template = $this->load_template( 'share_interface' );
@@ -1025,9 +1027,40 @@ class cb_p2_plugin extends cb_p2_core
 			
 			if($key=='twitter')
 			{
+				
 				$processed_url=str_replace('{FOLLOWACCOUNT}',$this->opt['social_networks'][$key]['follow'],$processed_url);
-		
-			
+						
+				if ( is_array( $tags ) AND count( $tags ) > 0 ) {
+					
+					$add_twitter_tags = '';
+					
+					foreach( $tags as $twitter_tag_key => $twitter_tag_value ) {
+						$add_twitter_tags .= str_replace( ' ', '', $tags[$twitter_tag_key]->name ) . ',';
+					}
+										
+					$processed_url .= '&hashtags=' . substr( $add_twitter_tags,  0, -1);
+					
+				}
+			}
+			if($key=='linkedin')
+			{
+				
+				$processed_url=str_replace('{FOLLOWACCOUNT}',$this->opt['social_networks'][$key]['follow'],$processed_url);
+				
+				if ( strlen( $share_title ) > 200 ) {
+					$share_title = substr( $share_title, 0 , 197 ) . '...';
+				}
+
+				setup_postdata( get_post( $post_id ) );
+				$linkedin_excerpt = get_the_excerpt();
+				wp_reset_postdata();
+				
+				if ( strlen( $linkedin_excerpt ) > 250 ) {
+					$linkedin_excerpt = substr( $linkedin_excerpt, 0 , 247 ) . '...';
+				}
+				
+				$processed_url .= '&title=' . urlencode( $share_title ).'&summary='.urlencode( $linkedin_excerpt );
+				
 			}
 			if($key=='pinterest')
 			{
@@ -1063,14 +1096,14 @@ class cb_p2_plugin extends cb_p2_core
 		$selected_icon_set = $this->opt['styles'][$selected_set]['icon_set'];
 		
 		// If a specific style is set for this post type, set it to that
-		
+
 		$post_type = get_post_type();
 
 		if ( $post_type AND array_key_exists($post_type,$this->opt['post_types']) )  {
 			$selected_set = $this->opt['post_types'][$post_type];
 			
 			if ( $selected_set == 'default' ) {
-				$selected_set = 'set_1';
+				$selected_set = $this->opt['style_set'];
 			}
 			
 			$selected_icon_set = $this->opt['styles'][$selected_set]['icon_set'];
@@ -1086,8 +1119,7 @@ class cb_p2_plugin extends cb_p2_core
 		if ( $selected_set == 'default' ) {
 			$selected_set = $this->opt['style_set'];
 			$selected_icon_set = $this->opt['styles'][$selected_set]['icon_set'];
-		}
-				
+		}		
 
 		$sizes = array(
 			'16',
@@ -1101,7 +1133,10 @@ class cb_p2_plugin extends cb_p2_core
 			'64',		
 		);
 		
+		
 		$closest_icon_size = $this->get_closest($this->opt['styles'][$selected_set]['button_icon_size'],$sizes);
+
+		
 		
 		
 		$button_icon = $this->internal['plugin_url'].'plugin/images/'.$selected_icon_set.'/'.$network.'/'.$closest_icon_size.'.png';
@@ -1192,7 +1227,7 @@ class cb_p2_plugin extends cb_p2_core
 			
 		}
 		
-		return '<div id="cb_p2_design_editor"><div id="cb_p2_style_preview_form_heading">Previewing:</div> <form action="" method="post" id="cb_p2_style_preview_form"><select id="cb_p2_set_selector" name="cb_p2_set">'.$sets.'</select></form><form name="cb_p2_move_to_setup_2" enctype="multipart/form-data" id="cb_p2_move_to_setup_2_id" method="post" action="'.$this->internal['admin_url'].'admin.php?page=setup_wizard_'.$this->internal['id'].'&'.$this->internal['prefix'].'setup_stage=1'.'"><input type="hidden" name="cb_p2_selected_style_at_setup" id="cb_p2_selected_style_at_setup" value="" /><div class="cb_p2_admin_button_general" id="cb_p2_customize_style_button" target="cb_p2_set_editor">Customize</div><div class="cb_p2_admin_button_general" id="cb_p2_select_style_and_move_to_next_step_button" target="cb_p2_set_editor">Select & Finish setup</div></form>
+		return '<div id="cb_p2_design_editor"><div id="cb_p2_style_preview_form_heading">Previewing:</div> <form action="" method="post" id="cb_p2_style_preview_form"><select id="cb_p2_set_selector" name="cb_p2_set">'.$sets.'</select></form><form name="cb_p2_move_to_setup_2" enctype="multipart/form-data" id="cb_p2_move_to_setup_2_id" method="post" action="'.$this->internal['admin_url'].'admin.php?page=setup_wizard_'.$this->internal['id'].'&'.$this->internal['prefix'].'setup_stage=1'.'"><input type="hidden" name="cb_p2_selected_style_at_setup" id="cb_p2_selected_style_at_setup" value="" /><div class="cb_p2_admin_button_general" id="cb_p2_customize_style_button" target="cb_p2_set_editor">Customize</div><div class="cb_p2_admin_button_general" id="cb_p2_select_style_and_move_to_next_step_button" target="cb_p2_set_editor">Select Style</div></form>
 
 	
 	</div>';		
@@ -1226,7 +1261,7 @@ class cb_p2_plugin extends cb_p2_core
 			return $content.$share_interface;
 		}		
 		
-		if ( $this->opt['content_buttons_placement'] == 'top' OR $this->opt['content_buttons_placement'] == 'top_and_bottom' ) {
+		if ( $this->opt['content_buttons_placement'] == 'top' OR $this->opt['content_buttons_placement'] == 'top_and_bottom'  ) {
 			$content = $share_interface.$content;
 		}
 		if ( $this->opt['content_buttons_placement'] == 'bottom' OR $this->opt['content_buttons_placement'] == 'top_and_bottom'  ) {
@@ -1278,7 +1313,7 @@ class cb_p2_plugin extends cb_p2_core
 		$important = ' !important';
 		// We want to mark  !important all css styles for frontend functions so the themes wont override them - except on pages with style editor and setup wizard on admin side
 		
-		if ( $_REQUEST['cb_p2_tab'] == 'customize_design' OR	
+		if ( ( isset( $_REQUEST['cb_p2_tab'] ) AND $_REQUEST['cb_p2_tab'] == 'customize_design' ) OR	
 			( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'setup_wizard_cb_p2' ) ) {
 			$important = '';
 		}
@@ -1287,16 +1322,34 @@ class cb_p2_plugin extends cb_p2_core
 		
 		echo '<style>
 		
-			// All styles are important-ized to prevent overriding by themes
+			/* All styles are important-ized to prevent overriding by themes */
 		
 			.cb_p2_share_container {
 				display: inline-table'.$important.';
-				width : '.$this->opt['styles'][$set]['container_wrapper_width'].$important.';
+				max-width : '.$this->opt['styles'][$set]['container_wrapper_width'].'px'.$important.';
+				width: 100%'.$important.';
 				clear: both'.$important.';
 				outline-style: none'.$important.';
 				box-shadow: none'.$important.';
+				text-align : '.$this->opt['styles'][$set]['container_wrapper_text_align'].$important.';
+				';
+				
+			if ( $this->opt['styles'][$set]['container_wrapper_sticky'] == 'yes' AND is_single() ) {
+				
+				echo '
+			
+				position:sticky;
+				position: -webkit-sticky;
+				top: '.$this->opt['styles'][$set]['container_wrapper_sticky_top_margin'].'px;
+				';
+				
 			}
-
+				
+			echo '
+			
+			// End of earlier css class
+			}
+			
 			.cb_p2_social_share {
 				display: inline-block'.$important.';
 				max-width : '.$this->opt['styles'][$set]['container_max_width'].'px'.$important.';
@@ -2322,6 +2375,28 @@ class cb_p2_plugin extends cb_p2_core
 		echo $this->make_style_editor_color_element($args);	
 		
 		$selections = array(
+			'left'  => 'Left',
+			'center' => 'Center',
+			'right' => 'Right',
+		
+		);
+
+		$args = array(
+			'title' => 'Container alignment',
+			'desc' => 'Change the alignment of container',
+			'name' => 'button_container_text_align',
+			'input_id' => 'cb_p2_style_editor_button_container_text_align',
+			'selections' => $selections,
+			'value' => $this->opt['styles'][$set]['button_container_text_align'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'text-align',
+			'css_suffix' => '',	
+		
+		);
+		
+		echo $this->make_style_editor_select_element($args);
+		
+		$selections = array(
 			'solid'  => 'Solid',
 			'dotted' => 'Dotted',
 			'dashed' => 'Dashed',
@@ -2371,6 +2446,99 @@ class cb_p2_plugin extends cb_p2_core
 		echo $this->make_style_editor_slider_element($args);		
 		
 		echo '</div>';
+		
+		echo '<div class="cb_p2_style_editor_item">';
+		
+		
+		$selections = array(
+			'yes'  => 'Yes',
+			'no' => 'No',
+		
+		);
+
+		$args = array(
+			'title' => 'Make shares sticky',
+			'desc' => 'Yes makes shares sticky when scrolled - recommended',
+			'name' => 'container_wrapper_sticky',
+			'input_id' => 'cb_p2_style_editor_button_container_wrapper_sticky',
+			'selections' => $selections,
+			'value' => $this->opt['styles'][$set]['container_wrapper_sticky'],
+			'css_target_element' => '',
+			'css_rule' => '',
+			'css_suffix' => '',	
+		
+		);
+		
+		echo $this->make_style_editor_select_element($args);
+		
+		
+		$args = array(
+			'title' => 'Top margin for sticky share',
+			'desc' => 'The space from top when the share is sticky',
+			'name' => 'container_wrapper_sticky_top_margin',
+			'input_id' => 'cb_p2_style_editor_container_wrapper_sticky_top_margin',
+			'slider_id' => 'cb_p2_value_slider_container_wrapper_sticky_top_margin',
+			'min' => 0,
+			'max' => 200,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['container_wrapper_sticky_top_margin'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'top',
+			'css_suffix' => 'px',
+			'size' => 1,
+			'maxlength' => 3		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+		
+
+		$args = array(
+			'title' => 'Container wrapper max width',
+			'desc' => 'Controls width of the space that wraps the container',
+			'name' => 'container_wrapper_width',
+			'input_id' => 'cb_p2_style_editor_container_wrapper_max_width',
+			'slider_id' => 'cb_p2_value_slider_container_wrapper_max_width',
+			'min' => 10,
+			'max' => 2000,
+			'step' => 1,
+			'value' => $this->opt['styles'][$set]['container_wrapper_max_width'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'max-width',
+			'css_suffix' => 'px',
+			'size' => 2,
+			'maxlength' => 2		
+		
+		);
+		
+		echo $this->make_style_editor_slider_element($args);
+		
+
+		$selections = array(
+			'left'  => 'Left',
+			'center' => 'Center',
+			'right' => 'Right',
+		
+		);
+
+		$args = array(
+			'title' => 'Container wrapper text alignment',
+			'desc' => 'Change the alignment of items inside wrapper',
+			'name' => 'container_wrapper_text_align',
+			'input_id' => 'cb_p2_style_editor_button_container_wrapper_text_align',
+			'selections' => $selections,
+			'value' => $this->opt['styles'][$set]['container_wrapper_text_align'],
+			'css_target_element' => '.cb_p2_social_share',
+			'css_rule' => 'text-align',
+			'css_suffix' => '',	
+		
+		);
+		
+		echo $this->make_style_editor_select_element($args);		
+		
+		
+		echo '</div>';
+		
 		echo '<input type="hidden" name="style_id" value="'.$set.'" />';
 		echo '</div></form>';
 		

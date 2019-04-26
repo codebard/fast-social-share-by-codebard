@@ -3,7 +3,7 @@
 	Plugin Name: Fast Custom Social Share by CodeBard
 	Plugin URI: https://wordpress.org/plugins/fast-social-share-by-codebard/
 	Description: Very fast, very customizable, very easy social share buttons
-	Version: 1.0.3
+	Version: 1.0.5
 	Author: CodeBard	
 	License: GPLv2
 	Author URI: http://codebard.com
@@ -11,7 +11,39 @@
 	Domain Path: /lang
 */
 
+if ( ! function_exists( 'fcssbc_fs' ) ) {
+    // Create a helper function for easy SDK access.
+    function fcssbc_fs() {
+        global $fcssbc_fs;
 
+        if ( ! isset( $fcssbc_fs ) ) {
+            // Include Freemius SDK.
+            require_once dirname(__FILE__) . '/freemius/start.php';
+
+            $fcssbc_fs = fs_dynamic_init( array(
+                'id'                  => '3686',
+                'slug'                => 'fast-custom-social-share-by-codebard',
+                'type'                => 'plugin',
+                'public_key'          => 'pk_95745c13523bc491989a680af3798',
+                'is_premium'          => false,
+                'has_addons'          => false,
+                'has_paid_plans'      => false,
+                'menu'                => array(
+                    'first-path'     => 'admin.php?page=setup_wizard_cb_p2&cb_p2_setup_stage=1',
+                    'account'        => false,
+                    'support'        => false,
+                ),
+            ) );
+        }
+
+        return $fcssbc_fs;
+    }
+
+    // Init Freemius.
+    fcssbc_fs();
+    // Signal that SDK was initiated.
+    do_action( 'fcssbc_fs_loaded' );
+}
 
 
 class cb_p2_core {

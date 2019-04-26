@@ -30,7 +30,7 @@ $this->opt = array_replace_recursive(
 				'page' => 'none',
 			),
 			
-			'content_buttons_placement' => 'bottom',
+			'content_buttons_placement' => 'top_and_bottom',
 			
 			'styles' => array(
 				'set_1' => array(
@@ -56,6 +56,7 @@ $this->opt = array_replace_recursive(
 					'button_hover_text_decoration' => 'none',
 					'follow_button_icon_size' => '32',
 					'container_wrapper_width' => '100%',
+					'container_wrapper_max_width' => '2000',
 					'button_container_margin_top' => '20px',
 					'button_container_text_align' => 'center',
 					'button_text_align' => 'center',
@@ -68,6 +69,9 @@ $this->opt = array_replace_recursive(
 					'container_border_style' => 'solid',
 					'container_border_radius' => '0',
 					'container_max_width' => '2000',
+					'container_wrapper_text_align' => 'center',
+					'container_wrapper_sticky' => 'yes',
+					'container_wrapper_sticky_top_margin'=>'5',
 					
 				),
 				'set_2' => array(
@@ -478,6 +482,7 @@ $this->opt = array_replace_recursive(
 				'button_hover_text_decoration'=>'none',		 
 				'follow_button_icon_size'=>'32',
 				'container_wrapper_width'=>'100%',
+				'container_wrapper_max_width' => '2000',
 				'button_container_margin_top'=>'20px',
 				'button_container_text_align'=>'center',
 				'button_text_align'=>'center',
@@ -490,6 +495,9 @@ $this->opt = array_replace_recursive(
 				'container_border_style'=>'solid',
 				'container_border_radius'=>'0',
 				'container_max_width' => '2000',
+				'container_wrapper_text_align' => 'center',
+				'container_wrapper_sticky' => 'yes',
+				'container_wrapper_sticky_top_margin'=>'5',
 				
 			),			
 			
@@ -518,17 +526,6 @@ $this->opt = array_replace_recursive(
 					'text_after'=> 'Share on Twitter', 
 					'icon'=> 'default', 
 					'url'=> 'http://twitter.com/share?text={CONTENTTITLE}&amp;url={CONTENTURL}&amp;via={FOLLOWACCOUNT}',
-					'active'=> 'yes',
-					'follow'=>'',
-					'sort'=>0,
-				),
-				'googleplus'=> array(
-					'name'=> 'Google+',
-					'id'=> 'googleplus', 
-					'text_before'=> '', 
-					'text_after'=> 'Share on Google+',
-					'icon'=> 'default',  
-					'url'=> 'http://plus.google.com/share?url={CONTENTURL}',
 					'active'=> 'yes',
 					'follow'=>'',
 					'sort'=>0,

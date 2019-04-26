@@ -21,6 +21,10 @@
 		
 		$sets = '';
 		
+		$placement_top_and_bottom = '';
+		$placement_bottom = '';
+		$placement_top = '';
+		
 		foreach ( $this->opt['styles'] as $key => $value ) {
 			
 			$set_name = $key;
