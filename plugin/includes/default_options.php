@@ -26,7 +26,7 @@ $this->opt = array_replace_recursive(
 			),
 			
 			'post_types' => array(
-				'post' => 'set_1',
+				'post' => 'default',
 				'page' => 'none',
 			),
 			

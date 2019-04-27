@@ -6,7 +6,8 @@ class cb_p2_plugin extends cb_p2_core
 	public function plugin_construct() {
 		
 		// If Patreon_WordPress class is not found, drop a notice and exit.
-
+		
+		
 		add_action( 'plugins_loaded', array(&$this, 'init'),60);
 		add_action('admin_init', array(&$this, 'admin_init'));
 		
@@ -40,13 +41,14 @@ class cb_p2_plugin extends cb_p2_core
 	
 		add_menu_page( $this->lang['admin_menu_label'], $this->lang['admin_menu_label'], 'administrator', 'settings_'.$this->internal['id'], array(&$this,'do_settings_pages'), $this->internal['plugin_url'].'images/admin_menu_icon.png', 86 );
 
-		add_submenu_page ( '', $this->lang['admin_menu_label'], $this->lang['admin_menu_label'], 'administrator', 'setup_wizard_'.$this->internal['id'], array(&$this,'do_setup_wizard'), $this->internal['plugin_url'].'images/admin_menu_icon.png', 86 );		
+		add_submenu_page ( '', $this->lang['admin_menu_label'], $this->lang['admin_menu_label'], 'administrator', 'setup_wizard_'.$this->internal['id'], array(&$this,'do_setup_wizard'), $this->internal['plugin_url'].'images/admin_menu_icon.png', 86 );	
 		
 	}
 	public function admin_init_p() {
+				
 
 		$this->check_redirect_to_setup_wizard();
-				
+						
 		$this->internal['plugin_update_url'] =  wp_nonce_url(get_admin_url().'update.php?action=upgrade-plugin&plugin='.$this->internal['plugin_slug'],'upgrade-plugin_'.$this->internal['plugin_slug']);
 		
 		add_action( 'wp_ajax_'.$this->internal['prefix'].'install_update_plugins', array( &$this, 'install_update_plugins' ),10,1 );
@@ -79,7 +81,7 @@ class cb_p2_plugin extends cb_p2_core
 		{
 			add_action('admin_head', array(&$this, 'add_css_to_head'));
 		}
-				
+						
 	}
 	public function init_p() {
 		
@@ -1227,7 +1229,7 @@ class cb_p2_plugin extends cb_p2_core
 			
 		}
 		
-		return '<div id="cb_p2_design_editor"><div id="cb_p2_style_preview_form_heading">Previewing:</div> <form action="" method="post" id="cb_p2_style_preview_form"><select id="cb_p2_set_selector" name="cb_p2_set">'.$sets.'</select></form><form name="cb_p2_move_to_setup_2" enctype="multipart/form-data" id="cb_p2_move_to_setup_2_id" method="post" action="'.$this->internal['admin_url'].'admin.php?page=setup_wizard_'.$this->internal['id'].'&'.$this->internal['prefix'].'setup_stage=1'.'"><input type="hidden" name="cb_p2_selected_style_at_setup" id="cb_p2_selected_style_at_setup" value="" /><div class="cb_p2_admin_button_general" id="cb_p2_customize_style_button" target="cb_p2_set_editor">Customize</div><div class="cb_p2_admin_button_general" id="cb_p2_select_style_and_move_to_next_step_button" target="cb_p2_set_editor">Select Style</div></form>
+		return '<div id="cb_p2_design_editor"><div id="cb_p2_style_preview_form_heading">Previewing:</div> <form action="" method="post" id="cb_p2_style_preview_form"><select id="cb_p2_set_selector" name="cb_p2_set">'.$sets.'</select></form><form name="cb_p2_move_to_setup_2" enctype="multipart/form-data" id="cb_p2_move_to_setup_2_id" method="post" action="'.$this->internal['admin_url'].'admin.php?page=setup_wizard_'.$this->internal['id'].'&'.$this->internal['prefix'].'setup_stage=1'.'"><input type="hidden" name="cb_p2_selected_style_at_setup" id="cb_p2_selected_style_at_setup" value="" /><div class="cb_p2_admin_button_general" id="cb_p2_customize_style_button" target="cb_p2_set_editor">Customize</div><div class="cb_p2_admin_button_general" id="cb_p2_select_style_and_move_to_next_step_button" target="cb_p2_set_editor">Select Style & Finish</div></form>
 
 	
 	</div>';		
@@ -1290,16 +1292,16 @@ class cb_p2_plugin extends cb_p2_core
 		}
 		
 		// Set the set to default set if it is set to value default
-		
+
 		if ( $set == 'default' ) {
 			$set = $this->opt['style_set'];
 		}
-		
+
 		if ( $set == 'none' ) {
 			// We dont show buttons for this set. Return
 			return;
 		}
-		
+	
 		// Process some of the settings to make up for some defaults:
 		
 		foreach ( $this->opt['styles'][$set] as $key => $value ) {
@@ -2666,6 +2668,7 @@ class cb_p2_plugin extends cb_p2_core
 			wp_die();
 		}
 	}
+	
 	public function check_for_update($checked_data) 
 	{
 			global $wp_version, $plugin_version, $plugin_base;
