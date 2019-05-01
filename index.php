@@ -3,13 +3,75 @@
 	Plugin Name: Fast Custom Social Share by CodeBard
 	Plugin URI: https://wordpress.org/plugins/fast-social-share-by-codebard/
 	Description: Very fast, very customizable, very easy social share buttons
-	Version: 1.0.7
+	Version: 1.0.8
 	Author: CodeBard	
 	License: GPLv2
 	Author URI: http://codebard.com
 	Text Domain: cb_p2
 	Domain Path: /lang
 */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+if ( ! function_exists( 'fcssbc_fs' ) ) {
+    // Create a helper function for easy SDK access.
+    function fcssbc_fs() {
+        global $fcssbc_fs;
+
+        if ( ! isset( $fcssbc_fs ) ) {
+            // Include Freemius SDK.
+            require_once dirname(__FILE__) . '/freemius/start.php';
+
+            $fcssbc_fs = fs_dynamic_init( array(
+                'id'                  => '3686',
+                'slug'                => 'fast-custom-social-share-by-codebard',
+                'type'                => 'plugin',
+                'public_key'          => 'pk_95745c13523bc491989a680af3798',
+                'is_premium'          => false,
+                'has_addons'          => false,
+                'has_paid_plans'      => false,
+                'menu'                => array(
+                    'slug'           => 'settings_cb_p2',
+                    'first-path'     => 'admin.php?page=setup_wizard_cb_p2&cb_p2_setup_stage=2',
+                    'account'        => false,
+                ),
+            ) );
+        }
+
+        return $fcssbc_fs;
+    }
+	
+    $turn_fs_on = ('yes' === get_option( 'fcssbc_fs_on', 'no' ));
+
+    if ($turn_fs_on) {
+        // Init Freemius.
+        fcssbc_fs();
+		
+		
+        // Signal that SDK was initiated.
+        do_action( 'fcssbc_fs_loaded' );
+    }
+	
+	function my_fs_custom_icon() {
+		return dirname( __FILE__ ) . '/images/icon-256x256.png';
+	}
+ 
+	fcssbc_fs()->add_filter( 'plugin_icon' , 'my_fs_custom_icon' );
+}
+
+if ( ( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'setup_wizard_cb_p2' ) AND
+     ( isset( $_REQUEST['cb_p2_setup_stage'] ) AND $_REQUEST['cb_p2_setup_stage'] == '1' )
+) {
+    if ( ! $turn_fs_on ) {
+        update_option( 'fcssbc_fs_on', 'yes' );
+    }
+	
+
+    // Init first before calling `fs_redirect()`.
+    $fcssbc_fs = fcssbc_fs();
+
+    fs_redirect( $fcssbc_fs->get_activation_url() );
+}
 
 class cb_p2_core {
 

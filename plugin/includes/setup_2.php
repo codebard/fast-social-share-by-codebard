@@ -1,5 +1,6 @@
 <br /><br /><div class="cb_p2_install_plugins_vector"><img src="<?php echo $this->internal['plugin_url'] ?>images/Install-Final.png" border="0" /></div><?php
 
+// Due to freemius connect in stage 1, the below code cant save the form input from stage 0. This will be dealt with after freemius connect functions properly and redirects to this page
 
 ?>
 

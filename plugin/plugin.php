@@ -18,6 +18,7 @@ class cb_p2_plugin extends cb_p2_core
 		
 		add_action('admin_menu', array(&$this,'add_admin_menus'));
 		
+		
 		if( $this->required_plugins() AND ( !isset( $this->internal['setup_is_being_done'] ) OR !$this->internal['setup_is_being_done'] ) ) {
 			return;
 		}
@@ -41,11 +42,46 @@ class cb_p2_plugin extends cb_p2_core
 	
 		add_menu_page( $this->lang['admin_menu_label'], $this->lang['admin_menu_label'], 'administrator', 'settings_'.$this->internal['id'], array(&$this,'do_settings_pages'), $this->internal['plugin_url'].'images/admin_menu_icon.png', 86 );
 
-		add_submenu_page ( '', $this->lang['admin_menu_label'], $this->lang['admin_menu_label'], 'administrator', 'setup_wizard_'.$this->internal['id'], array(&$this,'do_setup_wizard'), $this->internal['plugin_url'].'images/admin_menu_icon.png', 86 );	
+		add_submenu_page ( '', $this->lang['admin_menu_label'], $this->lang['admin_menu_label'], 'administrator', 'setup_wizard_'.$this->internal['id'], array(&$this,'do_setup_wizard'), $this->internal['plugin_url'].'images/admin_menu_icon.png', 86 );
+		
+		
 		
 	}
 	public function admin_init_p() {
 				
+				
+
+		// This is added here to save the setup options early in order to enable freemium connect to work
+		if ( ( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'setup_wizard_cb_p2' ) AND
+			 ( isset( $_REQUEST['cb_p2_setup_stage'] ) AND $_REQUEST['cb_p2_setup_stage'] == '0' )
+		) {
+			if ( isset($_REQUEST['cb_p2_selected_style_at_setup'] ) AND array_key_exists($_REQUEST['cb_p2_selected_style_at_setup'],$this->opt['styles'] ) ) {
+	
+		
+				$this->opt['style_set'] = $_REQUEST['cb_p2_selected_style_at_setup'];
+				$this->internal['setup_is_being_done'] = false;
+				$this->opt['setup_is_being_done'] = false;
+				$this->opt['setup_done'] = true;
+				$this->update_opt();
+				
+				// Redirect to setup stage 2
+				
+				wp_redirect($this->internal['admin_url'].'admin.php?page=setup_wizard_'.$this->internal['id'].'&cb_p2_setup_stage=1');
+				exit;	
+				
+			}
+		}
+		
+		// If we are here and setup stage is at 1, then it means Freemius didnt kick in. Immediately take to setup finalization.
+		
+		if ( ( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'setup_wizard_cb_p2' ) AND
+			 ( isset( $_REQUEST['cb_p2_setup_stage'] ) AND $_REQUEST['cb_p2_setup_stage'] == '1' )
+		) {
+	
+			wp_redirect($this->internal['admin_url'].'admin.php?page=setup_wizard_'.$this->internal['id'].'&cb_p2_setup_stage=2');
+			exit;	
+		
+		}
 
 		$this->check_redirect_to_setup_wizard();
 						
@@ -234,13 +270,11 @@ class cb_p2_plugin extends cb_p2_core
 	}
 	public function do_setup_wizard_p() {
 		// Here we do and process setup wizard if it is not done:
-		
-		
+				
 		// Set the setup stage if setup is not done, setup is reset or stage 0 is requested
 		if(!isset($_REQUEST[$this->internal['prefix'].'setup_stage']) OR $_REQUEST[$this->internal['prefix'].'setup_stage'] == '0' OR isset( $_REQUEST[$this->internal['prefix'].'reset_setup_wizard'] ) ) {
 			$_REQUEST[$this->internal['prefix'].'setup_stage'] = 0;
 			$this->opt['setup_wizard_stage'] = 0;
-
 		}
 				
 		if ( !$this->opt['setup_done'] ) {
@@ -1229,7 +1263,7 @@ class cb_p2_plugin extends cb_p2_core
 			
 		}
 		
-		return '<div id="cb_p2_design_editor"><div id="cb_p2_style_preview_form_heading">Previewing:</div> <form action="" method="post" id="cb_p2_style_preview_form"><select id="cb_p2_set_selector" name="cb_p2_set">'.$sets.'</select></form><form name="cb_p2_move_to_setup_2" enctype="multipart/form-data" id="cb_p2_move_to_setup_2_id" method="post" action="'.$this->internal['admin_url'].'admin.php?page=setup_wizard_'.$this->internal['id'].'&'.$this->internal['prefix'].'setup_stage=1'.'"><input type="hidden" name="cb_p2_selected_style_at_setup" id="cb_p2_selected_style_at_setup" value="" /><div class="cb_p2_admin_button_general" id="cb_p2_customize_style_button" target="cb_p2_set_editor">Customize</div><div class="cb_p2_admin_button_general" id="cb_p2_select_style_and_move_to_next_step_button" target="cb_p2_set_editor">Select Style & Finish</div></form>
+		return '<div id="cb_p2_design_editor"><div id="cb_p2_style_preview_form_heading">Previewing:</div> <form action="" method="post" id="cb_p2_style_preview_form"><select id="cb_p2_set_selector" name="cb_p2_set">'.$sets.'</select></form><form name="cb_p2_move_to_setup_2" enctype="multipart/form-data" id="cb_p2_move_to_setup_2_id" method="post" action="'.$this->internal['admin_url'].'admin.php?page=setup_wizard_'.$this->internal['id'].'&'.$this->internal['prefix'].'setup_stage=0'.'"><input type="hidden" name="cb_p2_selected_style_at_setup" id="cb_p2_selected_style_at_setup" value="" /><div class="cb_p2_admin_button_general" id="cb_p2_customize_style_button" target="cb_p2_set_editor">Customize</div><div class="cb_p2_admin_button_general" id="cb_p2_select_style_and_move_to_next_step_button" target="cb_p2_set_editor">Select Style</div></form>
 
 	
 	</div>';		
