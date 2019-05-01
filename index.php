@@ -3,7 +3,7 @@
 	Plugin Name: Fast Custom Social Share by CodeBard
 	Plugin URI: https://wordpress.org/plugins/fast-social-share-by-codebard/
 	Description: Very fast, very customizable, very easy social share buttons
-	Version: 1.0.8
+	Version: 1.0.9
 	Author: CodeBard	
 	License: GPLv2
 	Author URI: http://codebard.com
@@ -17,7 +17,7 @@ if ( ! function_exists( 'fcssbc_fs' ) ) {
     // Create a helper function for easy SDK access.
     function fcssbc_fs() {
         global $fcssbc_fs;
-
+	
         if ( ! isset( $fcssbc_fs ) ) {
             // Include Freemius SDK.
             require_once dirname(__FILE__) . '/freemius/start.php';
@@ -41,22 +41,25 @@ if ( ! function_exists( 'fcssbc_fs' ) ) {
         return $fcssbc_fs;
     }
 	
+	function my_fs_custom_icon() {
+		return dirname( __FILE__ ) . '/images/icon-256x256.png';
+	}
+	
     $turn_fs_on = ('yes' === get_option( 'fcssbc_fs_on', 'no' ));
 
     if ($turn_fs_on) {
         // Init Freemius.
-        fcssbc_fs();
+        $fcssbc_fs = fcssbc_fs();
 		
+		
+		$fcssbc_fs->add_filter( 'plugin_icon' , 'my_fs_custom_icon' );
 		
         // Signal that SDK was initiated.
         do_action( 'fcssbc_fs_loaded' );
     }
 	
-	function my_fs_custom_icon() {
-		return dirname( __FILE__ ) . '/images/icon-256x256.png';
-	}
+	
  
-	fcssbc_fs()->add_filter( 'plugin_icon' , 'my_fs_custom_icon' );
 }
 
 if ( ( isset( $_REQUEST['page'] ) AND $_REQUEST['page'] == 'setup_wizard_cb_p2' ) AND
