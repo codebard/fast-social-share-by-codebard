@@ -225,10 +225,8 @@ class cb_p2_plugin extends cb_p2_core
 			if($got_updated) {
 				
 				// Yep, this plugin was updated. Do whatever necessary post-update action:
-						
-				$this->dismiss_admin_notice(array('notice_id'=>'update_available','notice_type'=>'info'));
-				
-				$this->queue_notice( $this->internal['after_update_notice'],'info','after_update_notice','perma',true);		
+			
+			
 			}
 		}
 	}
@@ -2680,11 +2678,7 @@ class cb_p2_plugin extends cb_p2_core
 			if(isset($checked_data->response[$this->internal['plugin_id'].'/index.php']) AND version_compare( $this->internal['version'], $checked_data->response[$this->internal['plugin_id'].'/index.php']->new_version, '<' ))
 			{
 
-				// place update link into update lang string :
-		
-				$update_link = $this->process_vars_to_template(array('plugin_update_url'=>$this->internal['plugin_update_url']),$this->lang['update_available']);
-
-				$this->queue_notice($update_link,'info','update_available','perma',true);		
+				// Do whatever necessary i an update is available	
 			}
 			return $checked_data;
 		
